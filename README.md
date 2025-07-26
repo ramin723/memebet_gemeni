@@ -1,23 +1,25 @@
 # MemeBet - TON Blockchain Betting Platform
 
-A modern betting platform built with Nuxt 3, Vue.js, and TON blockchain integration.
+A modern betting platform built with Nuxt 4, Vue 3, and TON blockchain integration.
 
 ## 🚀 Features
 
 - **TON Wallet Integration**: Connect with TON wallets via TonConnect
 - **PostgreSQL Database**: Robust data storage with Sequelize ORM
 - **JWT Authentication**: Secure user authentication
-- **Modern UI**: Built with Vue 3 and Nuxt 3
+- **Modern UI**: Built with Vue 3 and Nuxt 4
 - **TypeScript**: Full type safety
+- **Pinia State Management**: Reactive state management
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Nuxt 3, Vue 3, TypeScript
+- **Frontend**: Nuxt 4, Vue 3.5, TypeScript
 - **Backend**: Node.js, Express (via Nuxt server routes)
 - **Database**: PostgreSQL with Sequelize ORM
-- **Blockchain**: TON (The Open Network)
-- **Authentication**: JWT
+- **Blockchain**: TON (The Open Network) with TonConnect
+- **Authentication**: JWT (jsonwebtoken)
 - **State Management**: Pinia
+- **Development**: Nuxt DevTools enabled
 
 ## 📋 Prerequisites
 
@@ -39,7 +41,7 @@ npm install
 ```
 
 ### 3. Environment Setup
-Copy `.env.example` to `.env` and configure your environment variables:
+Create a `.env` file in the root directory and configure your environment variables:
 
 ```bash
 # PostgreSQL Database Credentials
@@ -68,10 +70,12 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 ```
 memebet_gemeni/
 ├── app/                 # Nuxt app directory
+│   └── app.vue         # Main app component
 ├── public/             # Static files
-├── .env               # Environment variables
-├── nuxt.config.ts     # Nuxt configuration
-└── package.json       # Dependencies
+├── .env               # Environment variables (not in git)
+├── nuxt.config.ts     # Nuxt 4 configuration
+├── package.json       # Dependencies
+└── tsconfig.json      # TypeScript configuration
 ```
 
 ## 🔧 Development
@@ -88,7 +92,30 @@ npm run build
 
 # Preview production build
 npm run preview
+
+# Generate static site
+npm run generate
 ```
+
+## 📦 Dependencies
+
+### Core
+- **Nuxt 4.0.1** - Full-stack Vue framework
+- **Vue 3.5.17** - Progressive JavaScript framework
+- **TypeScript** - Type safety
+
+### Blockchain
+- **@tonconnect/sdk 3.2.0** - TON Connect SDK
+- **@tonconnect/ui 2.2.0** - TON Connect UI components
+
+### Database
+- **Sequelize 6.37.7** - ORM for Node.js
+- **pg 8.16.3** - PostgreSQL client
+- **pg-hstore 2.3.4** - PostgreSQL hstore support
+
+### Authentication & State
+- **jsonwebtoken 9.0.2** - JWT implementation
+- **@pinia/nuxt 0.11.2** - State management
 
 ## 🤝 Contributing
 
