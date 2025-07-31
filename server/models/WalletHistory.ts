@@ -1,11 +1,11 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
 import { User } from './User';
-import { EventAttributes } from '../types/EventInterface';
+import { WalletHistoryAttributes } from '../types/WalletHistoryInterface';
 
-export class Event extends Model<EventAttributes> {}
+export class WalletHistory extends Model<WalletHistoryAttributes> {}
 
-export const initEventModel = (sequelize: Sequelize): void => {
-  Event.init(
+export const initWalletHistoryModel = (sequelize: Sequelize): void => {
+  WalletHistory.init(
     {
       id: {
         type: DataTypes.BIGINT,
@@ -13,46 +13,40 @@ export const initEventModel = (sequelize: Sequelize): void => {
         autoIncrement: true,
         allowNull: false,
       },
-      creatorId: {
+      userId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
           model: 'users',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
-      title: {
-        type: DataTypes.STRING,
+      type: {
+        type: DataTypes.ENUM('DEPOSIT', 'WITHDRAWAL', 'BET', 'WIN', 'REFUND'),
         allowNull: false,
+      },
+      amount: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: BigInt(0),
+      },
+      balanceBefore: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: BigInt(0),
+      },
+      balanceAfter: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: BigInt(0),
       },
       description: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      status: {
-        type: DataTypes.ENUM('DRAFT', 'PENDING_APPROVAL', 'ACTIVE', 'REJECTED', 'CLOSED', 'RESOLVED', 'CANCELLED'),
-        allowNull: false,
-        defaultValue: 'PENDING_APPROVAL',
-      },
-      bettingDeadline: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      resolutionSource: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      winningOutcomeId: {
+      referenceId: {
         type: DataTypes.BIGINT,
-        allowNull: true,
-      },
-      isFeatured: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      adminNote: {
-        type: DataTypes.TEXT,
         allowNull: true,
       },
       createdAt: {
@@ -68,10 +62,10 @@ export const initEventModel = (sequelize: Sequelize): void => {
     },
     {
       sequelize,
-      tableName: 'events',
+      tableName: 'wallet_histories',
       timestamps: true,
     }
   );
 };
 
-export default Event; 
+export default WalletHistory; 

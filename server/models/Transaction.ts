@@ -1,11 +1,11 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
 import { User } from './User';
-import { EventAttributes } from '../types/EventInterface';
+import { TransactionAttributes } from '../types/TransactionInterface';
 
-export class Event extends Model<EventAttributes> {}
+export class Transaction extends Model<TransactionAttributes> {}
 
-export const initEventModel = (sequelize: Sequelize): void => {
-  Event.init(
+export const initTransactionModel = (sequelize: Sequelize): void => {
+  Transaction.init(
     {
       id: {
         type: DataTypes.BIGINT,
@@ -13,15 +13,34 @@ export const initEventModel = (sequelize: Sequelize): void => {
         autoIncrement: true,
         allowNull: false,
       },
-      creatorId: {
+      userId: {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
           model: 'users',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
-      title: {
+      type: {
+        type: DataTypes.ENUM('DEPOSIT', 'WITHDRAWAL'),
+        allowNull: false,
+      },
+      amount: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: BigInt(0),
+      },
+      status: {
+        type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'FAILED'),
+        allowNull: false,
+        defaultValue: 'PENDING',
+      },
+      txHash: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      walletAddress: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -29,30 +48,8 @@ export const initEventModel = (sequelize: Sequelize): void => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      status: {
-        type: DataTypes.ENUM('DRAFT', 'PENDING_APPROVAL', 'ACTIVE', 'REJECTED', 'CLOSED', 'RESOLVED', 'CANCELLED'),
-        allowNull: false,
-        defaultValue: 'PENDING_APPROVAL',
-      },
-      bettingDeadline: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      resolutionSource: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      winningOutcomeId: {
-        type: DataTypes.BIGINT,
-        allowNull: true,
-      },
-      isFeatured: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      adminNote: {
-        type: DataTypes.TEXT,
+      metadata: {
+        type: DataTypes.JSON,
         allowNull: true,
       },
       createdAt: {
@@ -68,10 +65,10 @@ export const initEventModel = (sequelize: Sequelize): void => {
     },
     {
       sequelize,
-      tableName: 'events',
+      tableName: 'transactions',
       timestamps: true,
     }
   );
 };
 
-export default Event; 
+export default Transaction; 

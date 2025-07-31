@@ -4,6 +4,10 @@ import { Sequelize } from 'sequelize';
 import { User, initUserModel } from '../models/User';
 import { Event, initEventModel } from '../models/Event';
 import { Outcome, initOutcomeModel } from '../models/Outcome';
+import { Bet, initBetModel } from '../models/Bet';
+import { WalletHistory, initWalletHistoryModel } from '../models/WalletHistory';
+import { Transaction, initTransactionModel } from '../models/Transaction';
+import { PendingCommission, initPendingCommissionModel } from '../models/PendingCommission';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log('🔧 Initializing Sequelize plugin...');
@@ -34,6 +38,10 @@ export default defineNitroPlugin(async (nitroApp) => {
     initUserModel(sequelize);
     initEventModel(sequelize);
     initOutcomeModel(sequelize);
+    initBetModel(sequelize);
+    initWalletHistoryModel(sequelize);
+    initTransactionModel(sequelize);
+    initPendingCommissionModel(sequelize);
     console.log('✅ Models initialized successfully.');
     
     // تعریف روابط بین مدل‌ها
@@ -57,6 +65,86 @@ export default defineNitroPlugin(async (nitroApp) => {
     Outcome.belongsTo(Event, {
       foreignKey: 'eventId',
       as: 'event'
+    });
+    
+    // User -> Bet (یک به چند)
+    User.hasMany(Bet, {
+      foreignKey: 'userId',
+      as: 'bets'
+    });
+    Bet.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+    
+    // Event -> Bet (یک به چند)
+    Event.hasMany(Bet, {
+      foreignKey: 'eventId',
+      as: 'bets'
+    });
+    Bet.belongsTo(Event, {
+      foreignKey: 'eventId',
+      as: 'event'
+    });
+    
+    // Outcome -> Bet (یک به چند)
+    Outcome.hasMany(Bet, {
+      foreignKey: 'outcomeId',
+      as: 'bets'
+    });
+    Bet.belongsTo(Outcome, {
+      foreignKey: 'outcomeId',
+      as: 'outcome'
+    });
+    
+    // User -> WalletHistory (یک به چند)
+    User.hasMany(WalletHistory, {
+      foreignKey: 'userId',
+      as: 'walletHistories'
+    });
+    WalletHistory.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+    
+    // User -> Transaction (یک به چند)
+    User.hasMany(Transaction, {
+      foreignKey: 'userId',
+      as: 'transactions'
+    });
+    Transaction.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+    
+    // User -> PendingCommission (یک به چند)
+    User.hasMany(PendingCommission, {
+      foreignKey: 'userId',
+      as: 'pendingCommissions'
+    });
+    PendingCommission.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+    
+    // Event -> PendingCommission (یک به چند)
+    Event.hasMany(PendingCommission, {
+      foreignKey: 'eventId',
+      as: 'pendingCommissions'
+    });
+    PendingCommission.belongsTo(Event, {
+      foreignKey: 'eventId',
+      as: 'event'
+    });
+    
+    // Bet -> PendingCommission (یک به چند)
+    Bet.hasMany(PendingCommission, {
+      foreignKey: 'betId',
+      as: 'pendingCommissions'
+    });
+    PendingCommission.belongsTo(Bet, {
+      foreignKey: 'betId',
+      as: 'bet'
     });
     
     console.log('✅ Model associations set up successfully.');

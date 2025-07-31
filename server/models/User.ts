@@ -1,14 +1,7 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
-import { UserAttributes } from '../types/models';
+import { UserAttributes } from '../types/UserInterface';
 
-export class User extends Model<UserAttributes> implements UserAttributes {
-  public id!: bigint;
-  public wallet_address!: string;
-  public username!: string | null;
-  public balance!: bigint;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-}
+export class User extends Model<UserAttributes> {}
 
 export const initUserModel = (sequelize: Sequelize): void => {
   User.init(
@@ -32,6 +25,11 @@ export const initUserModel = (sequelize: Sequelize): void => {
         type: DataTypes.BIGINT,
         allowNull: false,
         defaultValue: 0,
+      },
+      role: {
+        type: DataTypes.ENUM('USER', 'ADMIN'),
+        allowNull: false,
+        defaultValue: 'USER',
       },
       createdAt: {
         type: DataTypes.DATE,

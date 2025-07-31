@@ -44,9 +44,15 @@ export default defineEventHandler(async (event) => {
       console.log(`✅ User found with ID: ${user.id}`);
     }
 
+    // تبدیل به آبجکت ساده
+    const plainUser = user.get({ plain: true });
+    console.log('🔍 Plain user object:', plainUser);
+    console.log('🔍 Plain user ID:', plainUser.id);
+    console.log('🔍 Plain user ID type:', typeof plainUser.id);
+
     // قرار دادن اطلاعات کاربر در context
-    event.context.user = user;
-    console.log(`🔐 User authenticated: ${user.wallet_address} with ID: ${user.dataValues.id}`);
+    event.context.user = plainUser;
+    console.log(`🔐 User authenticated: ${plainUser.wallet_address} with ID: ${plainUser.id}`);
 
   } catch (error) {
     console.error('❌ Auth middleware error:', error);

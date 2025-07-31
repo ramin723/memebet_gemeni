@@ -138,6 +138,9 @@ export default defineEventHandler(async (event) => {
     
     console.log('🟢 [/api/events] Found', events.length, 'events out of', totalCount, 'total');
 
+    // تبدیل به آبجکت‌های ساده
+    const plainEvents = events.map(event => event.get({ plain: true }));
+
     // محاسبه اطلاعات صفحه‌بندی
     const totalPages = Math.ceil(totalCount / limit);
     const hasNextPage = currentPage < totalPages;
@@ -145,7 +148,7 @@ export default defineEventHandler(async (event) => {
 
     return { 
       success: true, 
-      events,
+      events: plainEvents,
       pagination: {
         currentPage,
         pageSize: limit,

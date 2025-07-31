@@ -1,17 +1,28 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
+import { User } from './User';
 import { Event } from './Event';
-import { OutcomeAttributes } from '../types/OutcomeInterface';
+import { Outcome } from './Outcome';
+import { BetAttributes } from '../types/BetInterface';
 
-export class Outcome extends Model<OutcomeAttributes> {}
+export class Bet extends Model<BetAttributes> {}
 
-export const initOutcomeModel = (sequelize: Sequelize): void => {
-  Outcome.init(
+export const initBetModel = (sequelize: Sequelize): void => {
+  Bet.init(
     {
       id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
+      },
+      userId: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
       },
       eventId: {
         type: DataTypes.BIGINT,
@@ -22,24 +33,19 @@ export const initOutcomeModel = (sequelize: Sequelize): void => {
         },
         onDelete: 'CASCADE',
       },
-      title: {
-        type: DataTypes.STRING,
+      outcomeId: {
+        type: DataTypes.BIGINT,
         allowNull: false,
+        references: {
+          model: 'outcomes',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
       },
-      totalAmount: {
+      amount: {
         type: DataTypes.BIGINT,
         allowNull: false,
         defaultValue: BigInt(0),
-      },
-      totalBets: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      isWinner: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -54,10 +60,10 @@ export const initOutcomeModel = (sequelize: Sequelize): void => {
     },
     {
       sequelize,
-      tableName: 'outcomes',
+      tableName: 'bets',
       timestamps: true,
     }
   );
 };
 
-export default Outcome; 
+export default Bet; 
