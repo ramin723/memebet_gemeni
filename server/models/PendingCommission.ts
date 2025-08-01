@@ -40,6 +40,10 @@ export function initPendingCommissionModel(sequelize: any) {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.ENUM('PLATFORM', 'CREATOR', 'REFERRAL'),
+        allowNull: false,
+      },
       status: {
         type: DataTypes.ENUM('PENDING', 'PAID', 'CANCELLED'),
         allowNull: false,

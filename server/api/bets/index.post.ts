@@ -4,11 +4,13 @@ import { Event } from '../../models/Event';
 import { Outcome } from '../../models/Outcome';
 import { Bet } from '../../models/Bet';
 import { WalletHistory } from '../../models/WalletHistory';
+import { EventReferral } from '../../models/EventReferral';
 
 interface CreateBetBody {
   eventId: string;
   outcomeId: string;
   amount: string;
+  referralCode?: string;
 }
 
 export default defineEventHandler(async (event) => {
@@ -126,6 +128,55 @@ export default defineEventHandler(async (event) => {
       } as any, { transaction });
       
       // --- پایان استاندارد طلایی ---
+
+      // --- START REFERRAL LOGIC ---
+      const { referralCode } = body;
+
+      if (referralCode) {
+        console.log(`🤝 Referral code provided: ${referralCode}`);
+
+        // ۱. پیدا کردن کاربر معرف
+        const referrer = await User.findOne({
+          where: { referralCode: referralCode },
+          transaction
+        });
+
+        // ۲. بررسی شرایط: معرف باید وجود داشته باشد و کاربر نمی‌تواند خودش را معرفی کند
+        if (referrer && referrer.get('id') !== userId) {
+          const referrerId = referrer.get('id') as string;
+          console.log(`✅ Referrer found with ID: ${referrerId}`);
+
+          // ۳. بررسی اینکه آیا قبلاً برای این کاربر و این رویداد ارجاعی ثبت شده یا نه
+          const existingReferral = await EventReferral.findOne({
+            where: {
+              eventId: eventId,
+              referredId: userId
+            },
+            transaction
+          });
+
+          if (!existingReferral) {
+            // ۴. ایجاد رکورد ارجاع جدید
+            await EventReferral.create({
+              eventId: eventId,
+              referrerId: referrerId,
+              referredId: userId.toString(),
+              // فعلا کمیسیون را صفر در نظر می‌گیریم. بعدا می‌توانیم منطق آن را اضافه کنیم.
+              commission: '0', 
+              status: 'pending'
+            } as any, { transaction });
+            console.log(`✅ New referral recorded for event ${eventId} from referrer ${referrerId} to user ${userId}`);
+          } else {
+            console.log(`🟡 Referral already exists for this user and event. Skipping.`);
+          }
+        } else if (referrer && referrer.get('id') === userId) {
+          console.log(`🟡 User tried to refer themselves. Skipping.`);
+        } 
+        else {
+          console.log(`⚠️ Referral code "${referralCode}" not found or invalid.`);
+        }
+      }
+      // ---  END REFERRAL LOGIC  ---
 
       await transaction.commit();
 

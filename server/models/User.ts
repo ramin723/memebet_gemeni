@@ -31,6 +31,21 @@ export const initUserModel = (sequelize: Sequelize): void => {
         allowNull: false,
         defaultValue: 'USER',
       },
+      referralCode: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: true,
+        field: 'referral_code',
+      },
+      permissions: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+      },
+      status: {
+        type: DataTypes.ENUM('ACTIVE', 'SUSPENDED', 'BANNED'),
+        allowNull: false,
+        defaultValue: 'ACTIVE',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

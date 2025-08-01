@@ -23,7 +23,7 @@ export const initWalletHistoryModel = (sequelize: Sequelize): void => {
         onDelete: 'CASCADE',
       },
       type: {
-        type: DataTypes.ENUM('DEPOSIT', 'WITHDRAWAL', 'BET', 'WIN', 'REFUND'),
+        type: DataTypes.ENUM('DEPOSIT', 'WITHDRAWAL', 'BET', 'WIN', 'REFUND', 'COMMISSION'),
         allowNull: false,
       },
       amount: {

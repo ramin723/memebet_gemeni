@@ -8,6 +8,10 @@ import { Bet, initBetModel } from '../models/Bet';
 import { WalletHistory, initWalletHistoryModel } from '../models/WalletHistory';
 import { Transaction, initTransactionModel } from '../models/Transaction';
 import { PendingCommission, initPendingCommissionModel } from '../models/PendingCommission';
+import { EventReferral, initEventReferralModel } from '../models/EventReferral';
+import { Tag, initTagModel } from '../models/Tag';
+import { EventTag, initEventTagModel } from '../models/EventTag';
+import { EventTemplate, initEventTemplateModel } from '../models/EventTemplate';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log('🔧 Initializing Sequelize plugin...');
@@ -42,6 +46,10 @@ export default defineNitroPlugin(async (nitroApp) => {
     initWalletHistoryModel(sequelize);
     initTransactionModel(sequelize);
     initPendingCommissionModel(sequelize);
+    initEventReferralModel(sequelize);
+    initTagModel(sequelize);
+    initEventTagModel(sequelize);
+    initEventTemplateModel(sequelize);
     console.log('✅ Models initialized successfully.');
     
     // تعریف روابط بین مدل‌ها
@@ -145,6 +153,60 @@ export default defineNitroPlugin(async (nitroApp) => {
     PendingCommission.belongsTo(Bet, {
       foreignKey: 'betId',
       as: 'bet'
+    });
+    
+    // User -> EventReferral (as Referrer)
+    User.hasMany(EventReferral, {
+      foreignKey: 'referrerId',
+      as: 'referralsMade'
+    });
+    EventReferral.belongsTo(User, {
+      foreignKey: 'referrerId',
+      as: 'referrer'
+    });
+
+    // User -> EventReferral (as Referred)
+    User.hasMany(EventReferral, {
+      foreignKey: 'referredId',
+      as: 'referralsReceived'
+    });
+    EventReferral.belongsTo(User, {
+      foreignKey: 'referredId',
+      as: 'referred'
+    });
+
+    // Event -> EventReferral
+    Event.hasMany(EventReferral, {
+      foreignKey: 'eventId',
+      as: 'referrals'
+    });
+    EventReferral.belongsTo(Event, {
+      foreignKey: 'eventId',
+      as: 'event'
+    });
+
+    // Event <-> Tag (Many-to-Many)
+    Event.belongsToMany(Tag, {
+      through: EventTag,
+      foreignKey: 'eventId',
+      otherKey: 'tagId',
+      as: 'tags'
+    });
+    Tag.belongsToMany(Event, {
+      through: EventTag,
+      foreignKey: 'tagId',
+      otherKey: 'eventId',
+      as: 'events'
+    });
+
+    // EventTemplate -> Event (One-to-Many)
+    EventTemplate.hasMany(Event, {
+      foreignKey: 'templateId',
+      as: 'events'
+    });
+    Event.belongsTo(EventTemplate, {
+      foreignKey: 'templateId',
+      as: 'template'
     });
     
     console.log('✅ Model associations set up successfully.');

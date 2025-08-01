@@ -47,6 +47,11 @@ export const initBetModel = (sequelize: Sequelize): void => {
         allowNull: false,
         defaultValue: BigInt(0),
       },
+      status: {
+        type: DataTypes.ENUM('PENDING', 'WON', 'LOST', 'CANCELLED'),
+        allowNull: false,
+        defaultValue: 'PENDING',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

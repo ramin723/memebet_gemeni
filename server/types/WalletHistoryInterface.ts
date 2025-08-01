@@ -1,7 +1,7 @@
 export interface WalletHistoryAttributes {
   id?: string;
   userId?: string;
-  type?: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND';
+  type?: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'COMMISSION';
   amount?: string;
   balanceBefore?: string;
   balanceAfter?: string;
