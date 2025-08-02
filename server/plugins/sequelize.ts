@@ -12,6 +12,12 @@ import { EventReferral, initEventReferralModel } from '../models/EventReferral';
 import { Tag, initTagModel } from '../models/Tag';
 import { EventTag, initEventTagModel } from '../models/EventTag';
 import { EventTemplate, initEventTemplateModel } from '../models/EventTemplate';
+import { Task, initTaskModel } from '../models/Task';
+import { UserTask, initUserTaskModel } from '../models/UserTask';
+import { Comment, initCommentModel } from '../models/Comment';
+import { Report, initReportModel } from '../models/Report';
+import { UserPreference, initUserPreferenceModel } from '../models/UserPreference';
+import { Notification, initNotificationModel } from '../models/Notification';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log('🔧 Initializing Sequelize plugin...');
@@ -50,6 +56,12 @@ export default defineNitroPlugin(async (nitroApp) => {
     initTagModel(sequelize);
     initEventTagModel(sequelize);
     initEventTemplateModel(sequelize);
+    initTaskModel(sequelize);
+    initUserTaskModel(sequelize);
+    initCommentModel(sequelize);
+    initReportModel(sequelize);
+    initUserPreferenceModel(sequelize);
+    initNotificationModel(sequelize);
     console.log('✅ Models initialized successfully.');
     
     // تعریف روابط بین مدل‌ها
@@ -199,6 +211,16 @@ export default defineNitroPlugin(async (nitroApp) => {
       as: 'events'
     });
 
+    // Tag Self-Referential (Hierarchical)
+    Tag.belongsTo(Tag, {
+      foreignKey: 'parentId',
+      as: 'parent'
+    });
+    Tag.hasMany(Tag, {
+      foreignKey: 'parentId',
+      as: 'children'
+    });
+
     // EventTemplate -> Event (One-to-Many)
     EventTemplate.hasMany(Event, {
       foreignKey: 'templateId',
@@ -207,6 +229,114 @@ export default defineNitroPlugin(async (nitroApp) => {
     Event.belongsTo(EventTemplate, {
       foreignKey: 'templateId',
       as: 'template'
+    });
+
+    // User <-> Task (Many-to-Many through UserTask)
+    User.belongsToMany(Task, {
+      through: UserTask,
+      foreignKey: 'userId',
+      otherKey: 'taskId',
+      as: 'tasks'
+    });
+    Task.belongsToMany(User, {
+      through: UserTask,
+      foreignKey: 'taskId',
+      otherKey: 'userId',
+      as: 'users'
+    });
+
+    // User -> UserTask (One-to-Many)
+    User.hasMany(UserTask, {
+      foreignKey: 'userId',
+      as: 'userTasks'
+    });
+    UserTask.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+
+    // Task -> UserTask (One-to-Many)
+    Task.hasMany(UserTask, {
+      foreignKey: 'taskId',
+      as: 'userTasks'
+    });
+    UserTask.belongsTo(Task, {
+      foreignKey: 'taskId',
+      as: 'task'
+    });
+
+    // User -> Comment (One-to-Many)
+    User.hasMany(Comment, {
+      foreignKey: 'userId',
+      as: 'comments'
+    });
+    Comment.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+
+    // Event -> Comment (One-to-Many)
+    Event.hasMany(Comment, {
+      foreignKey: 'eventId',
+      as: 'comments'
+    });
+    Comment.belongsTo(Event, {
+      foreignKey: 'eventId',
+      as: 'event'
+    });
+
+    // User -> Report (as Reporter)
+    User.hasMany(Report, {
+      foreignKey: 'reporterId',
+      as: 'reportsMade'
+    });
+    Report.belongsTo(User, {
+      foreignKey: 'reporterId',
+      as: 'reporter'
+    });
+
+    // User -> Report (as Resolver)
+    User.hasMany(Report, {
+      foreignKey: 'resolvedBy',
+      as: 'reportsResolved'
+    });
+    Report.belongsTo(User, {
+      foreignKey: 'resolvedBy',
+      as: 'resolver'
+    });
+
+    // Event -> Report (Polymorphic)
+    Event.hasMany(Report, {
+      foreignKey: 'entityId',
+      scope: { entityType: 'EVENT' },
+      as: 'reports'
+    });
+
+    // Comment -> Report (Polymorphic)
+    Comment.hasMany(Report, {
+      foreignKey: 'entityId',
+      scope: { entityType: 'COMMENT' },
+      as: 'reports'
+    });
+
+    // User <-> UserPreference (One-to-One)
+    User.hasOne(UserPreference, {
+      foreignKey: 'userId',
+      as: 'preferences'
+    });
+    UserPreference.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+
+    // User -> Notification (One-to-Many)
+    User.hasMany(Notification, {
+      foreignKey: 'userId',
+      as: 'notifications'
+    });
+    Notification.belongsTo(User, {
+      foreignKey: 'userId',
+      as: 'user'
     });
     
     console.log('✅ Model associations set up successfully.');

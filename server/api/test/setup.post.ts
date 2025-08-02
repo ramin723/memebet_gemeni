@@ -6,25 +6,26 @@ import { Tag } from '../../models/Tag';
 import { Bet } from '../../models/Bet';
 import { PendingCommission } from '../../models/PendingCommission';
 import { EventReferral } from '../../models/EventReferral';
+import { EventTemplate } from '../../models/EventTemplate';
 
-// Helper function to create a user if they don't exist
-const findOrCreateUser = async (walletAddress: string, username: string, balance: bigint, referralCode: string, transaction: any) => {
-  const [user] = await User.findOrCreate({
-    where: { wallet_address: walletAddress },
-    defaults: {
-      wallet_address: walletAddress,
-      username: username,
-      balance: balance.toString(),
-      referralCode: referralCode,
-    },
-    transaction
-  });
-  if (user.isNewRecord) {
-      console.log(`✅ User "${username}" created.`);
-  } else {
-      console.log(`🟡 User "${username}" already exists.`);
-  }
-  return user.get({ plain: true });
+// Helper to create users with specific roles and permissions
+const findOrCreateUser = async (data: { wallet: string, username: string, balance: bigint, referralCode: string, role?: 'USER' | 'ADMIN', status?: 'ACTIVE' | 'SUSPENDED', permissions?: any }, transaction: any) => {
+    const [user] = await User.findOrCreate({
+        where: { wallet_address: data.wallet },
+        defaults: {
+            wallet_address: data.wallet,
+            username: data.username,
+            balance: data.balance.toString(),
+            referralCode: data.referralCode,
+            role: data.role || 'USER',
+            status: data.status || 'ACTIVE',
+            permissions: data.permissions || null,
+        },
+        transaction
+    });
+    const status = user.isNewRecord ? 'created' : 'found';
+    console.log(`✅ User "${data.username}" ${status}.`);
+    return user.get({ plain: true });
 };
 
 export default defineEventHandler(async (event) => {
@@ -35,91 +36,61 @@ export default defineEventHandler(async (event) => {
   const transaction = await event.context.sequelize.transaction();
 
   try {
-    console.log('🧪 Setting up test data...');
+    console.log('🧪 Setting up RICH test data...');
 
-    // ۱. ایجاد کاربران تستی
-    const creator = await findOrCreateUser('wallet_creator', 'EventCreator', 1000000n, 'CREATE1', transaction);
-    const referrer = await findOrCreateUser('wallet_referrer', 'ReferrerUser', 1000000n, 'REFER1', transaction);
-    const referredBettor = await findOrCreateUser('wallet_referred', 'ReferredBettor', 50000n, 'BETT_A', transaction);
-    const normalBettor = await findOrCreateUser('wallet_normal', 'NormalBettor', 80000n, 'BETT_B', transaction);
-    const winnerBettor = await findOrCreateUser('wallet_winner', 'WinnerBettor', 120000n, 'BETT_C', transaction);
+    // --- ۱. ایجاد کاربران با نقش‌های متنوع ---
+    const superAdmin = await findOrCreateUser({ wallet: 'wallet_superadmin', username: 'SuperAdmin', balance: 1000000n, referralCode: 'SADMIN', role: 'ADMIN', permissions: { system_admin: true } }, transaction);
+    const financialAdmin = await findOrCreateUser({ wallet: 'wallet_financial', username: 'FinancialAdmin', balance: 1000000n, referralCode: 'FADMIN', role: 'ADMIN', permissions: { financial_management: true } }, transaction);
+    const eventAdmin = await findOrCreateUser({ wallet: 'wallet_event', username: 'EventAdmin', balance: 1000000n, referralCode: 'EADMIN', role: 'ADMIN', permissions: { event_management: true, template_management: true } }, transaction);
+    const suspendedUser = await findOrCreateUser({ wallet: 'wallet_suspended', username: 'SuspendedUser', balance: 10000n, referralCode: 'SUSP1', status: 'SUSPENDED' }, transaction);
+    const creator = await findOrCreateUser({ wallet: 'wallet_creator', username: 'EventCreator', balance: 500000n, referralCode: 'CREATE1' }, transaction);
+    const bettor1 = await findOrCreateUser({ wallet: 'wallet_bettor1', username: 'BettorOne', balance: 75000n, referralCode: 'BETT1' }, transaction);
+    const bettor2 = await findOrCreateUser({ wallet: 'wallet_bettor2', username: 'BettorTwo', balance: 120000n, referralCode: 'BETT2' }, transaction);
 
-    // ۲. ایجاد تگ‌های تستی
-    const [techTagInstance] = await Tag.findOrCreate({ where: { name: 'Technology' }, transaction });
-    const [financeTagInstance] = await Tag.findOrCreate({ where: { name: 'Finance' }, transaction });
-    const techTag = techTagInstance.get({ plain: true });
-    const financeTag = financeTagInstance.get({ plain: true });
-
-    // ۳. ایجاد رویداد اصلی
-    const [eventInstance] = await Event.findOrCreate({
-      where: { title: '[TEST] Bitcoin Price Prediction' },
-      defaults: {
-        creatorId: creator.id,
-        title: '[TEST] Bitcoin Price Prediction',
-        description: 'Will Bitcoin price surpass $70,000 by the end of the week?',
-        status: 'ACTIVE',
-        bettingDeadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-      },
-      transaction
-    });
-    const plainEvent = eventInstance.get({ plain: true });
-
-    // ۴. اتصال تگ‌ها به رویداد (فعلاً حذف شده تا روابط تعریف شوند)
-    console.log('✅ Event and tags created/found.');
-
-    // ۵. ایجاد گزینه‌ها (Outcomes)
-    const [outcomeYesInstance] = await Outcome.findOrCreate({
-      where: { eventId: plainEvent.id, title: 'Yes, it will surpass $70,000' },
-      transaction
-    });
-    const [outcomeNoInstance] = await Outcome.findOrCreate({
-      where: { eventId: plainEvent.id, title: 'No, it will stay below $70,000' },
-      transaction
-    });
-    const outcomeYes = outcomeYesInstance.get({ plain: true });
-    const outcomeNo = outcomeNoInstance.get({ plain: true });
-    console.log('✅ Outcomes created/found.');
-
-    // ۶. ثبت ارجاع (Referral)
-    await EventReferral.findOrCreate({
-        where: { eventId: plainEvent.id!, referredId: referredBettor.id! },
+    // --- ۲. ایجاد یک قالب برای استفاده ---
+    const [templateInstance] = await EventTemplate.findOrCreate({
+        where: { name: 'Crypto Price Prediction' },
         defaults: {
-            eventId: plainEvent.id!,
-            referrerId: referrer.id!,
-            referredId: referredBettor.id!,
-            commission: 0,
-            status: 'pending'
-        } as any,
+            name: 'Crypto Price Prediction',
+            description: 'A template for crypto price predictions.',
+            creatorType: 'BOTH',
+            isActive: true,
+            structure: {
+                templateType: 'BINARY',
+                titleStructure: 'Will [asset] reach [target] by [date]?',
+                inputs: [
+                    { name: 'asset', label: 'Asset Name', type: 'text' },
+                    { name: 'target', label: 'Target Price', type: 'text' },
+                    { name: 'date', label: 'Target Date', type: 'date' }
+                ]
+            }
+        },
         transaction
     });
-    console.log('✅ Referral link established.');
+    const template = templateInstance.get({ plain: true });
 
-    // ۷. ثبت شرط‌ها
-    const betReferredInstance = await Bet.create({ eventId: plainEvent.id, userId: referredBettor.id, outcomeId: outcomeYes.id, amount: '20000' }, { transaction });
-    const betWinnerInstance = await Bet.create({ eventId: plainEvent.id, userId: winnerBettor.id, outcomeId: outcomeYes.id, amount: '50000' }, { transaction });
-    const betNormalInstance = await Bet.create({ eventId: plainEvent.id, userId: normalBettor.id, outcomeId: outcomeNo.id, amount: '30000' }, { transaction });
-    const betReferred = betReferredInstance.get({ plain: true });
-    const betWinner = betWinnerInstance.get({ plain: true });
-    const betNormal = betNormalInstance.get({ plain: true });
-    console.log('✅ Bets placed.');
-    
-    // ۸. ایجاد کمیسیون‌های در انتظار
-    await PendingCommission.bulkCreate([
-        // Bet 1 (Referred)
-        { eventId: plainEvent.id, userId: '1', betId: betReferred.id, amount: (20000n * 6n / 100n).toString(), type: 'PLATFORM' },
-        { eventId: plainEvent.id, userId: creator.id, betId: betReferred.id, amount: (20000n * 5n / 100n).toString(), type: 'CREATOR' },
-        { eventId: plainEvent.id, userId: referrer.id, betId: betReferred.id, amount: (20000n * 4n / 100n).toString(), type: 'REFERRAL' },
-        // Bet 2 (Winner)
-        { eventId: plainEvent.id, userId: '1', betId: betWinner.id, amount: (50000n * 6n / 100n).toString(), type: 'PLATFORM' },
-        { eventId: plainEvent.id, userId: creator.id, betId: betWinner.id, amount: (50000n * 5n / 100n).toString(), type: 'CREATOR' },
-        // Bet 3 (Normal)
-        { eventId: plainEvent.id, userId: '1', betId: betNormal.id, amount: (30000n * 6n / 100n).toString(), type: 'PLATFORM' },
-        { eventId: plainEvent.id, userId: creator.id, betId: betNormal.id, amount: (30000n * 5n / 100n).toString(), type: 'CREATOR' },
-    ], { transaction });
-    console.log('✅ Pending commissions created.');
+    // --- ۳. ایجاد یک رویداد در انتظار تایید ---
+    const [pendingEventInstance] = await Event.findOrCreate({
+        where: { title: '[PENDING] Will Solana reach $200?' },
+        defaults: {
+            creatorId: creator.id,
+            title: '[PENDING] Will Solana reach $200?',
+            description: 'A test event created by a user, waiting for admin approval.',
+            status: 'PENDING_APPROVAL',
+            bettingDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        },
+        transaction
+    });
+    const pendingEvent = pendingEventInstance.get({ plain: true });
 
+    // ایجاد گزینه‌ها برای رویداد در انتظار
+    await Outcome.findOrCreate({ where: { eventId: pendingEvent.id, title: 'Yes' }, transaction });
+    await Outcome.findOrCreate({ where: { eventId: pendingEvent.id, title: 'No' }, transaction });
+
+
+    console.log('✅ All test data setup complete!');
     await transaction.commit();
-    return { success: true, message: 'Test data setup complete!', eventId: plainEvent.id };
+    return { success: true, message: 'Rich test data setup complete!' };
 
   } catch (error: any) {
     await transaction.rollback();

@@ -33,6 +33,16 @@ export const initTagModel = (sequelize: Sequelize): void => {
         allowNull: true,
         field: 'description'
       },
+      parentId: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        field: 'parent_id',
+        references: {
+          model: 'tags',
+          key: 'id',
+        },
+        comment: 'شناسه تگ والد برای ساختار سلسله‌مراتبی',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

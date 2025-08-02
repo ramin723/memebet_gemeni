@@ -9,6 +9,9 @@ export interface EventAttributes {
   winningOutcomeId?: string | null;
   isFeatured?: boolean;
   adminNote?: string | null;
+  imageUrl?: string | null;
+  minBetAmount?: string | null;
+  maxBetAmount?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 } 

@@ -55,6 +55,21 @@ export const initEventModel = (sequelize: Sequelize): void => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      imageUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'URL تصویر رویداد',
+      },
+      minBetAmount: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        comment: 'حداقل مبلغ شرط‌بندی',
+      },
+      maxBetAmount: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        comment: 'حداکثر مبلغ شرط‌بندی',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

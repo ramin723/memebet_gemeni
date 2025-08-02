@@ -46,6 +46,28 @@ export const initUserModel = (sequelize: Sequelize): void => {
         allowNull: false,
         defaultValue: 'ACTIVE',
       },
+      level: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+        comment: 'سطح کاربر',
+      },
+      xp: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+        comment: 'تجربه کاربر',
+      },
+      avatarUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'URL آواتار کاربر',
+      },
+      headerUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'URL هدر پروفایل کاربر',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
