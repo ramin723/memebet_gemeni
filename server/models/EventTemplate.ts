@@ -58,12 +58,15 @@ export const initEventTemplateModel = (sequelize: Sequelize): void => {
       underscored: true, // This will ensure field names are snake_case
       indexes: [
         {
+          name: 'event_templates_name_idx',
           fields: ['name']
         },
         {
+          name: 'event_templates_creator_type_idx',
           fields: ['creator_type']
         },
         {
+          name: 'event_templates_is_active_idx',
           fields: ['is_active']
         }
       ]

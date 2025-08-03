@@ -93,12 +93,15 @@ export const initUserPreferenceModel = (sequelize: Sequelize): void => {
       timestamps: true,
       indexes: [
         {
+          name: 'user_preferences_language_idx',
           fields: ['language']
         },
         {
+          name: 'user_preferences_currency_idx',
           fields: ['currency']
         },
         {
+          name: 'user_preferences_theme_idx',
           fields: ['theme']
         }
       ]

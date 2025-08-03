@@ -1,6 +1,7 @@
-import { defineEventHandler, readBody, createError } from 'h3';
+import { defineEventHandler, createError, readBody } from 'h3';
 import { Notification } from '../../../models/Notification';
 import { User } from '../../../models/User';
+import { Op } from 'sequelize';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -105,7 +106,7 @@ export default defineEventHandler(async (event) => {
           const sevenDaysAgo = new Date();
           sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
           whereClause.createdAt = {
-            [require('sequelize').Op.gte]: sevenDaysAgo
+            [Op.gte]: sevenDaysAgo
           };
           break;
         case 'ACTIVE':
@@ -117,7 +118,7 @@ export default defineEventHandler(async (event) => {
         case 'PREMIUM':
           // کاربران پریمیوم (با موجودی بالا)
           whereClause.balance = {
-            [require('sequelize').Op.gte]: 1000000 // مثال: موجودی بالای 1 میلیون
+            [Op.gte]: 1000000 // مثال: موجودی بالای 1 میلیون
           };
           break;
         default:

@@ -82,15 +82,19 @@ export const initEventReferralModel = (sequelize: Sequelize): void => {
       underscored: true,
       indexes: [
         {
+          name: 'event_referrals_event_id_idx',
           fields: ['event_id']
         },
         {
+          name: 'event_referrals_referrer_id_idx',
           fields: ['referrer_id']
         },
         {
+          name: 'event_referrals_referred_id_idx',
           fields: ['referred_id']
         },
         {
+          name: 'event_referrals_status_idx',
           fields: ['status']
         }
       ]

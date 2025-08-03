@@ -53,12 +53,15 @@ export const initEventTagModel = (sequelize: Sequelize): void => {
       underscored: true,
       indexes: [
         {
+          name: 'event_tags_event_id_idx',
           fields: ['event_id']
         },
         {
+          name: 'event_tags_tag_id_idx',
           fields: ['tag_id']
         },
         {
+          name: 'event_tags_event_tag_unique_idx',
           fields: ['event_id', 'tag_id'],
           unique: true
         }

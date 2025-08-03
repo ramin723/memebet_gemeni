@@ -1,5 +1,6 @@
 import { defineEventHandler, createError } from 'h3';
 import { Notification } from '../../../models/Notification';
+import { Op, fn, col } from 'sequelize';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -56,7 +57,7 @@ export default defineEventHandler(async (event) => {
     const typeStats = await Notification.findAll({
       attributes: [
         'type',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('COUNT', col('id')), 'count']
       ],
       group: ['type'],
       raw: true
@@ -66,7 +67,7 @@ export default defineEventHandler(async (event) => {
     const priorityStats = await Notification.findAll({
       attributes: [
         'priority',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('COUNT', col('id')), 'count']
       ],
       group: ['priority'],
       raw: true
@@ -76,10 +77,10 @@ export default defineEventHandler(async (event) => {
     const userStats = await Notification.findAll({
       attributes: [
         'userId',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('COUNT', col('id')), 'count']
       ],
       group: ['userId'],
-      order: [[require('sequelize').fn('COUNT', require('sequelize').col('id')), 'DESC']],
+      order: [[fn('COUNT', col('id')), 'DESC']],
       limit: 10,
       raw: true
     });
@@ -91,15 +92,15 @@ export default defineEventHandler(async (event) => {
     const dailyStats = await Notification.findAll({
       where: {
         createdAt: {
-          [require('sequelize').Op.gte]: thirtyDaysAgo
+          [Op.gte]: thirtyDaysAgo
         }
       },
       attributes: [
-        [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('DATE', col('createdAt')), 'date'],
+        [fn('COUNT', col('id')), 'count']
       ],
-      group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-      order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+      group: [fn('DATE', col('createdAt'))],
+      order: [[fn('DATE', col('createdAt')), 'ASC']],
       raw: true
     });
 

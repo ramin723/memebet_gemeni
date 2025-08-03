@@ -74,12 +74,15 @@ export const initCommentModel = (sequelize: Sequelize): void => {
       timestamps: true,
       indexes: [
         {
+          name: 'comments_user_id_idx',
           fields: ['userId']
         },
         {
+          name: 'comments_event_id_idx',
           fields: ['eventId']
         },
         {
+          name: 'comments_created_at_idx',
           fields: ['createdAt']
         }
       ]

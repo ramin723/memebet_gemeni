@@ -1,5 +1,6 @@
 import { defineEventHandler, createError } from 'h3';
 import { Report } from '../../../models/Report';
+import { Op, fn, col } from 'sequelize';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -56,7 +57,7 @@ export default defineEventHandler(async (event) => {
     const reasonStats = await Report.findAll({
       attributes: [
         'reason',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('COUNT', col('id')), 'count']
       ],
       group: ['reason'],
       raw: true
@@ -66,7 +67,7 @@ export default defineEventHandler(async (event) => {
     const statusStats = await Report.findAll({
       attributes: [
         'status',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('COUNT', col('id')), 'count']
       ],
       group: ['status'],
       raw: true
@@ -76,7 +77,7 @@ export default defineEventHandler(async (event) => {
     const entityTypeStats = await Report.findAll({
       attributes: [
         'entityType',
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('COUNT', col('id')), 'count']
       ],
       group: ['entityType'],
       raw: true
@@ -89,15 +90,15 @@ export default defineEventHandler(async (event) => {
     const dailyStats = await Report.findAll({
       where: {
         createdAt: {
-          [require('sequelize').Op.gte]: thirtyDaysAgo
+          [Op.gte]: thirtyDaysAgo
         }
       },
       attributes: [
-        [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+        [fn('DATE', col('created_at')), 'date'],
+        [fn('COUNT', col('id')), 'count']
       ],
-      group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-      order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+      group: [fn('DATE', col('created_at'))],
+      order: [[fn('DATE', col('created_at')), 'ASC']],
       raw: true
     });
 

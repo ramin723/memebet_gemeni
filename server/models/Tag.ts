@@ -61,6 +61,7 @@ export const initTagModel = (sequelize: Sequelize): void => {
       underscored: true,
       indexes: [
         {
+          name: 'tags_name_idx',
           fields: ['name']
         }
       ]

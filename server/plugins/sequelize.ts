@@ -36,6 +36,9 @@ export default defineNitroPlugin(async (nitroApp) => {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       dialect: 'postgres',
+      define: {
+        // غیرفعال کردن ایجاد خودکار ایندکس‌ها
+      },
     }
   );
 
@@ -343,7 +346,7 @@ export default defineNitroPlugin(async (nitroApp) => {
     
     // همگام‌سازی مدل‌ها با دیتابیس
     console.log('🔄 Syncing models with database...');
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: false });
     console.log('✅ Database tables synced successfully.');
     
     nitroApp.hooks.hook('request', (event) => {

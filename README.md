@@ -78,6 +78,16 @@ memebet_gemeni/
 └── tsconfig.json      # TypeScript configuration
 ```
 
+## 📚 Important Documentation
+
+### Sequelize Model Configuration
+Due to inconsistent `underscored` settings across models, special attention is required when writing queries. See [SEQUELIZE_MODEL_CONFIGURATION.md](./SEQUELIZE_MODEL_CONFIGURATION.md) for detailed guidelines.
+
+**Quick Reference:**
+- Models with `underscored: true`: Use `created_at` in `fn()` and `col()`
+- Models without `underscored: true`: Use `createdAt` in `fn()` and `col()`
+- Always use `createdAt` in `where` clauses (Sequelize handles the mapping)
+
 ## 🔧 Development
 
 ```bash

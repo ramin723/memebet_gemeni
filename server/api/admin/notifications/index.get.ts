@@ -1,6 +1,7 @@
-import { defineEventHandler, getQuery, createError } from 'h3';
+import { defineEventHandler, createError, getQuery } from 'h3';
 import { Notification } from '../../../models/Notification';
 import { User } from '../../../models/User';
+import { Op } from 'sequelize';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -105,9 +106,9 @@ export default defineEventHandler(async (event) => {
     }
 
     if (search) {
-      whereClause[require('sequelize').Op.or] = [
-        { title: { [require('sequelize').Op.iLike]: `%${search}%` } },
-        { message: { [require('sequelize').Op.iLike]: `%${search}%` } }
+      whereClause[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { message: { [Op.iLike]: `%${search}%` } }
       ];
     }
 

@@ -7,6 +7,7 @@ import { Report } from '../../../models/Report';
 import { Notification } from '../../../models/Notification';
 import { Task } from '../../../models/Task';
 import { UserTask } from '../../../models/UserTask';
+import { Op, fn, col } from 'sequelize';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
       // آمار شرط‌بندی‌ها
       Bet.count(),
       Bet.count({ where: { status: 'PENDING' } }),
-      Bet.count({ where: { status: 'CONFIRMED' } }),
+      Bet.count({ where: { status: 'WON' } }),
       
       // آمار نظرات
       Comment.count(),
@@ -101,15 +102,15 @@ export default defineEventHandler(async (event) => {
       User.findAll({
         where: {
           createdAt: {
-            [require('sequelize').Op.gte]: sevenDaysAgo
+            [Op.gte]: sevenDaysAgo
           }
         },
         attributes: [
-          [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-          [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+          [fn('DATE', col('createdAt')), 'date'],
+          [fn('COUNT', col('id')), 'count']
         ],
-        group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-        order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+        group: [fn('DATE', col('createdAt'))],
+        order: [[fn('DATE', col('createdAt')), 'ASC']],
         raw: true
       }),
 
@@ -117,15 +118,15 @@ export default defineEventHandler(async (event) => {
       Event.findAll({
         where: {
           createdAt: {
-            [require('sequelize').Op.gte]: sevenDaysAgo
+            [Op.gte]: sevenDaysAgo
           }
         },
         attributes: [
-          [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-          [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+          [fn('DATE', col('createdAt')), 'date'],
+          [fn('COUNT', col('id')), 'count']
         ],
-        group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-        order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+        group: [fn('DATE', col('createdAt'))],
+        order: [[fn('DATE', col('createdAt')), 'ASC']],
         raw: true
       }),
 
@@ -133,15 +134,15 @@ export default defineEventHandler(async (event) => {
       Bet.findAll({
         where: {
           createdAt: {
-            [require('sequelize').Op.gte]: sevenDaysAgo
+            [Op.gte]: sevenDaysAgo
           }
         },
         attributes: [
-          [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-          [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+          [fn('DATE', col('createdAt')), 'date'],
+          [fn('COUNT', col('id')), 'count']
         ],
-        group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-        order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+        group: [fn('DATE', col('createdAt'))],
+        order: [[fn('DATE', col('createdAt')), 'ASC']],
         raw: true
       }),
 
@@ -149,15 +150,15 @@ export default defineEventHandler(async (event) => {
       Comment.findAll({
         where: {
           createdAt: {
-            [require('sequelize').Op.gte]: sevenDaysAgo
+            [Op.gte]: sevenDaysAgo
           }
         },
         attributes: [
-          [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-          [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+          [fn('DATE', col('createdAt')), 'date'],
+          [fn('COUNT', col('id')), 'count']
         ],
-        group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-        order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+        group: [fn('DATE', col('createdAt'))],
+        order: [[fn('DATE', col('createdAt')), 'ASC']],
         raw: true
       }),
 
@@ -165,15 +166,15 @@ export default defineEventHandler(async (event) => {
       Report.findAll({
         where: {
           createdAt: {
-            [require('sequelize').Op.gte]: sevenDaysAgo
+            [Op.gte]: sevenDaysAgo
           }
         },
         attributes: [
-          [require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'date'],
-          [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'count']
+          [fn('DATE', col('created_at')), 'date'],
+          [fn('COUNT', col('id')), 'count']
         ],
-        group: [require('sequelize').fn('DATE', require('sequelize').col('createdAt'))],
-        order: [[require('sequelize').fn('DATE', require('sequelize').col('createdAt')), 'ASC']],
+        group: [fn('DATE', col('created_at'))],
+        order: [[fn('DATE', col('created_at')), 'ASC']],
         raw: true
       })
     ]);
@@ -181,7 +182,7 @@ export default defineEventHandler(async (event) => {
     // محاسبه درصدها
     const userActivePercentage = totalUsers > 0 ? ((activeUsers / totalUsers) * 100).toFixed(2) : '0.00';
     const eventActivePercentage = totalEvents > 0 ? ((activeEvents / totalEvents) * 100).toFixed(2) : '0.00';
-    const betConfirmedPercentage = totalBets > 0 ? ((confirmedBets / totalBets) * 100).toFixed(2) : '0.00';
+    const betWonPercentage = totalBets > 0 ? ((confirmedBets / totalBets) * 100).toFixed(2) : '0.00';
     const commentActivePercentage = totalComments > 0 ? ((activeComments / totalComments) * 100).toFixed(2) : '0.00';
     const reportResolvedPercentage = totalReports > 0 ? ((resolvedReports / totalReports) * 100).toFixed(2) : '0.00';
 
@@ -204,7 +205,7 @@ export default defineEventHandler(async (event) => {
           bets: {
             total: totalBets,
             pending: pendingBets,
-            confirmed: confirmedBets
+            won: confirmedBets
           },
           comments: {
             total: totalComments,
@@ -229,7 +230,7 @@ export default defineEventHandler(async (event) => {
         percentages: {
           userActive: userActivePercentage,
           eventActive: eventActivePercentage,
-          betConfirmed: betConfirmedPercentage,
+          betConfirmed: betWonPercentage,
           commentActive: commentActivePercentage,
           reportResolved: reportResolvedPercentage
         },

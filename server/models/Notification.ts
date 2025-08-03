@@ -86,27 +86,35 @@ export const initNotificationModel = (sequelize: Sequelize): void => {
       timestamps: true,
       indexes: [
         {
+          name: 'notifications_user_id_idx',
           fields: ['userId']
         },
         {
+          name: 'notifications_type_idx',
           fields: ['type']
         },
         {
+          name: 'notifications_is_read_idx',
           fields: ['isRead']
         },
         {
+          name: 'notifications_is_archived_idx',
           fields: ['isArchived']
         },
         {
+          name: 'notifications_priority_idx',
           fields: ['priority']
         },
         {
+          name: 'notifications_created_at_idx',
           fields: ['createdAt']
         },
         {
+          name: 'notifications_user_read_idx',
           fields: ['userId', 'isRead']
         },
         {
+          name: 'notifications_user_archived_idx',
           fields: ['userId', 'isArchived']
         }
       ]

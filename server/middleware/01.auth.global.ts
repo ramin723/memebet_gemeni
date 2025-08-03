@@ -33,15 +33,41 @@ export default defineEventHandler(async (event) => {
     if (!user) {
       console.log(`👤 User not found, creating new user with wallet: ${walletAddress}`);
       
-      // ایجاد کاربر جدید
+      // ایجاد کاربر جدید با نقش ادمین
       user = await User.create({
         wallet_address: walletAddress,
-        balance: BigInt(0)
+        balance: BigInt(0),
+        role: 'ADMIN',
+        status: 'ACTIVE',
+        permissions: {
+          system_admin: true,
+          user_management: true,
+          event_management: true,
+          financial_management: true,
+          template_management: true
+        }
       } as any);
       
-      console.log(`✅ New user created with ID: ${user.id}`);
+      console.log(`✅ New admin user created with ID: ${user.id}`);
     } else {
       console.log(`✅ User found with ID: ${user.id}`);
+      
+      // اگر کاربر موجود است، مطمئن شویم که ادمین است
+      if (user.role !== 'ADMIN') {
+        console.log(`🔄 Updating user ${user.id} to admin role`);
+        await user.update({
+          role: 'ADMIN',
+          status: 'ACTIVE',
+          permissions: {
+            system_admin: true,
+            user_management: true,
+            event_management: true,
+            financial_management: true,
+            template_management: true
+          }
+        });
+        console.log(`✅ User ${user.id} updated to admin`);
+      }
     }
 
     // تبدیل به آبجکت ساده

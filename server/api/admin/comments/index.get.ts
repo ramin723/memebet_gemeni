@@ -1,7 +1,8 @@
-import { defineEventHandler, getQuery, createError } from 'h3';
+import { defineEventHandler, createError, getQuery } from 'h3';
 import { Comment } from '../../../models/Comment';
 import { User } from '../../../models/User';
 import { Event } from '../../../models/Event';
+import { Op } from 'sequelize';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -89,7 +90,7 @@ export default defineEventHandler(async (event) => {
 
     if (search) {
       whereClause.content = {
-        [require('sequelize').Op.iLike]: `%${search}%`
+        [Op.iLike]: `%${search}%`
       };
     }
 
