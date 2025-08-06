@@ -1,9 +1,9 @@
 <template>
   <Teleport to="body">
-    <div v-if="isOpen" class="command-palette-overlay" @click="close">
+    <div v-if="isOpen && !hasActiveModals" class="command-palette-overlay" @click="close" style="z-index: 9999;">
       <div class="command-palette-container" @click.stop>
         <div class="flex items-center border-b px-3">
-          <Icon name="heroicons:magnifying-glass" class="mr-2 h-4 w-4 shrink-0 opacity-50" />
+          <UIcon name="i-heroicons-magnifying-glass" class="mr-2 h-4 w-4 shrink-0 opacity-50" />
           <input
             ref="inputRef"
             v-model="search"
@@ -17,13 +17,13 @@
         </div>
         <div class="command-palette-list">
           <div v-if="!search" class="p-6 text-center">
-            <Icon name="heroicons:command-line" class="mx-auto h-12 w-12 opacity-50" />
+            <UIcon name="i-heroicons-command-line" class="mx-auto h-12 w-12 opacity-50" />
             <p class="mt-2 text-sm text-muted-foreground">
               دستورات موجود را جستجو کنید...
             </p>
           </div>
           <div v-else-if="filteredCommands.length === 0" class="p-6 text-center">
-            <Icon name="heroicons:magnifying-glass" class="mx-auto h-12 w-12 opacity-50" />
+            <UIcon name="i-heroicons-magnifying-glass" class="mx-auto h-12 w-12 opacity-50" />
             <p class="mt-2 text-sm text-muted-foreground">
               هیچ دستوری یافت نشد
             </p>
@@ -45,7 +45,7 @@
                 @mouseenter="selectedIndex = getItemIndex('navigation', index)"
               >
                 <div class="command-palette-item-icon">
-                  <Icon :name="item.icon" class="h-4 w-4" />
+                  <UIcon :name="item.icon" class="h-4 w-4" />
                 </div>
                 <div class="command-palette-item-content">
                   <div class="command-palette-item-title">{{ item.title }}</div>
@@ -73,7 +73,7 @@
                 @mouseenter="selectedIndex = getItemIndex('users', index)"
               >
                 <div class="command-palette-item-icon">
-                  <Icon :name="item.icon" class="h-4 w-4" />
+                  <UIcon :name="item.icon" class="h-4 w-4" />
                 </div>
                 <div class="command-palette-item-content">
                   <div class="command-palette-item-title">{{ item.title }}</div>
@@ -84,7 +84,7 @@
 
             <!-- Loading State -->
             <div v-if="isLoading" class="p-4 text-center">
-              <Icon name="heroicons:arrow-path" class="mx-auto h-6 w-6 animate-spin opacity-50" />
+              <UIcon name="i-heroicons-arrow-path" class="mx-auto h-6 w-6 animate-spin opacity-50" />
               <p class="mt-2 text-sm text-muted-foreground">در حال جستجو...</p>
             </div>
           </div>
@@ -97,10 +97,11 @@
 <script setup lang="ts">
 // Import the composable
 import { useCommandPalette } from '~/composables/useCommandPalette'
+import { useModalManager } from '~/composables/useModalManager'
 
 // Props
 interface Props {
-  modelValue?: boolean
+  modelValue?: boolean | Ref<boolean>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -128,9 +129,12 @@ const {
   selectPrevious
 } = useCommandPalette()
 
+// Use modal manager
+const { hasActiveModals } = useModalManager()
+
 // Computed
 const isOpenComputed = computed({
-  get: () => props.modelValue,
+  get: () => unref(props.modelValue),
   set: (value) => emit('update:modelValue', value)
 })
 

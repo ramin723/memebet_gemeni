@@ -1,24 +1,15 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ["@nuxt/ui"],
+  css: ['~/assets/css/tailwind.css'],
+  modules: ['@nuxt/ui'],
   pages: true,
-  
-  // تنظیمات Nuxt UI
-  ui: {
-    // Your configuration options here if needed in the future
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
   },
-  
-  // تنظیمات کامپوننت‌ها
-  components: {
-    dirs: [
-      '~/components'
-    ]
-  },
-  
-  // تنظیمات CSS
-  css: [
-    '~/assets/css/command-palette.css'
-  ]
+  nitro: {
+    compatibilityDate: '2025-08-04'
+  }
 })

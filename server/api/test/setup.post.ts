@@ -69,23 +69,109 @@ export default defineEventHandler(async (event) => {
     });
     const template = templateInstance.get({ plain: true });
 
-    // --- ۳. ایجاد یک رویداد در انتظار تایید ---
-    const [pendingEventInstance] = await Event.findOrCreate({
-        where: { title: '[PENDING] Will Solana reach $200?' },
-        defaults: {
-            creatorId: creator.id,
-            title: '[PENDING] Will Solana reach $200?',
+    // --- ۳. ایجاد 10 رویداد متنوع ---
+    const events = [
+        {
+            title: '[PENDING] Will Solana reach $200 by end of month?',
             description: 'A test event created by a user, waiting for admin approval.',
-            status: 'PENDING_APPROVAL',
+            status: 'PENDING_APPROVAL' as const,
             bettingDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+            creatorId: creator.id
         },
-        transaction
-    });
-    const pendingEvent = pendingEventInstance.get({ plain: true });
+        {
+            title: '[PENDING] Will Bitcoin hit $100,000 in 2024?',
+            description: 'Bitcoin price prediction for the year 2024.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Ethereum 2.0 launch in Q2?',
+            description: 'Ethereum upgrade prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Tesla stock reach $300?',
+            description: 'Tesla stock price prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Apple release new iPhone in September?',
+            description: 'Apple product launch prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will SpaceX land on Mars in 2024?',
+            description: 'Space exploration prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Netflix subscriber count exceed 250M?',
+            description: 'Streaming service growth prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Google release AI-powered search?',
+            description: 'Tech company AI development prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000), // 25 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Amazon drone delivery become mainstream?',
+            description: 'E-commerce innovation prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+            creatorId: creator.id
+        },
+        {
+            title: '[PENDING] Will Meta VR headset sales exceed 10M units?',
+            description: 'Virtual reality market prediction.',
+            status: 'PENDING_APPROVAL' as const,
+            bettingDeadline: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000), // 120 days
+            creatorId: creator.id
+        }
+    ];
 
-    // ایجاد گزینه‌ها برای رویداد در انتظار
-    await Outcome.findOrCreate({ where: { eventId: pendingEvent.id, title: 'Yes' }, transaction });
-    await Outcome.findOrCreate({ where: { eventId: pendingEvent.id, title: 'No' }, transaction });
+    // ایجاد رویدادها
+    for (const eventData of events) {
+        const [eventInstance] = await Event.findOrCreate({
+            where: { title: eventData.title },
+            defaults: {
+                creatorId: eventData.creatorId,
+                title: eventData.title,
+                description: eventData.description,
+                status: eventData.status,
+                bettingDeadline: eventData.bettingDeadline,
+            },
+            transaction
+        });
+        const event = eventInstance.get({ plain: true });
+
+        // ایجاد گزینه‌ها برای هر رویداد
+        await Outcome.findOrCreate({ 
+            where: { eventId: event.id, title: 'Yes' }, 
+            defaults: { eventId: event.id, title: 'Yes' },
+            transaction 
+        });
+        await Outcome.findOrCreate({ 
+            where: { eventId: event.id, title: 'No' }, 
+            defaults: { eventId: event.id, title: 'No' },
+            transaction 
+        });
+
+        console.log(`✅ Event "${eventData.title}" created.`);
+    }
 
 
     console.log('✅ All test data setup complete!');

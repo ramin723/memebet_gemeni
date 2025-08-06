@@ -1,0 +1,5 @@
+[33m53b8950[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m feat: Complete frontend development phase with comprehensive admin dashboard
+[33m6e1ae80[m feat: add admin reports management and fix Report model TypeScript errors
+[33m8ce4aef[m feat: add admin APIs and improve betting system - add admin APIs for deposits, withdrawals, users, events management - improve EventTemplate, EventTag, EventReferral, Tag models - add templates API - enhance commission and wallet history system
+[33m409fe4d[m feat: اضافه کردن سیستم شرطبندی کامل - مدلهای جدید (Bet, Transaction, WalletHistory, PendingCommission) - API های شرطبندی و کیف پول - سیستم مدیریت ادمین - فیکس BigInt برای Sequelize
+[33maca9419[m feat: تطبیق API events با معماری جدید - حذف احراز هویت اضافه کردن صفحهبندی حفظ فیلترها

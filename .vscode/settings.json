@@ -1,0 +1,17 @@
+{
+  "css.validate": false,
+  "tailwindCSS.includeLanguages": {
+    "vue": "html",
+    "vue-html": "html"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["@apply\\s+([^;}]+)", "([^;}]+)"],
+    ["classList\\.add\\(([^)]*)\\)", "([^)]*)"],
+    ["className\\s*=\\s*['\"`]([^'\"`]*)['\"`]", "([^'\"`]*)"]
+  ],
+  "tailwindCSS.files.exclude": [
+    "**/node_modules/**",
+    "**/.nuxt/**",
+    "**/dist/**"
+  ]
+} 

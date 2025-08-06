@@ -14,16 +14,26 @@
     "@pinia/nuxt": "^0.11.2",
     "@tonconnect/sdk": "^3.2.0",
     "@tonconnect/ui": "^2.2.0",
+    "date-fns-jalali": "^4.1.0-0",
     "jsonwebtoken": "^9.0.2",
     "nuxt": "^4.0.1",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.3",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.2",
+    "@iconify-json/lucide": "^1.2.60",
+    "@nuxt/icon": "^1.15.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/jsonwebtoken": "^9.0.10",
-    "dotenv": "^17.2.1"
+    "autoprefixer": "^10.4.21",
+    "dotenv": "^17.2.1",
+    "postcss": "^8.5.6"
   }
 }

@@ -7,6 +7,28 @@
       نمای کلی و آمار لحظه‌ای پلتفرم MemeBet
     </p>
 
+    <!-- تست کامپوننت‌های UI -->
+    <div class="mt-8 space-y-4">
+      <UButton color="primary" variant="solid">
+        دکمه تست UI
+      </UButton>
+      
+      <UCard>
+        <template #header>
+          <h3 class="font-semibold">تست کارت</h3>
+        </template>
+        <p>این یک کارت تست است</p>
+      </UCard>
+      
+      <UAlert
+        icon="i-heroicons-information-circle"
+        color="info"
+        variant="soft"
+        title="اطلاعیه تست"
+        description="این یک اطلاعیه تست است"
+      />
+    </div>
+
     <div v-if="pending" class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <UCard v-for="i in 4" :key="i" class="animate-pulse">
         <div class="h-8 w-1/2 bg-gray-200 dark:bg-gray-700 rounded-md" />
@@ -18,13 +40,13 @@
     <div v-else-if="error" class="mt-8">
       <UAlert
         icon="i-heroicons-exclamation-triangle"
-        color="red"
+        color="error" 
         variant="soft"
         title="خطا در دریافت اطلاعات"
         :description="error.message"
       >
         <template #actions>
-          <UButton color="red" variant="ghost" @click="refresh">تلاش مجدد</UButton>
+          <UButton color="error" variant="ghost" @click="() => refresh()">تلاش مجدد</UButton>
         </template>
       </UAlert>
     </div>
