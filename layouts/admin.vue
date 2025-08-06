@@ -9,7 +9,7 @@
         <div>
           </div>
         <div>
-          <BaseCommandPalette />
+          <!-- Command Palette removed -->
         </div>
       </header>
       <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">

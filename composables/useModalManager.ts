@@ -1,8 +1,11 @@
-import { ref, readonly } from 'vue'
+// composables/useModalManager.ts
+
+import { ref, readonly, computed } from 'vue'
+
+// ✅ وضعیت را به بیرون از تابع منتقل کنید تا در کل برنامه مشترک باشد
+const activeModals = ref<Set<string>>(new Set())
 
 export const useModalManager = () => {
-  const activeModals = ref<Set<string>>(new Set())
-
   const registerModal = (modalId: string) => {
     activeModals.value.add(modalId)
   }
@@ -15,8 +18,8 @@ export const useModalManager = () => {
 
   return {
     activeModals: readonly(activeModals),
-    hasActiveModals: readonly(hasActiveModals),
+    hasActiveModals,
     registerModal,
     unregisterModal
   }
-} 
+}

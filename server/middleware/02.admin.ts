@@ -80,6 +80,9 @@ export default defineEventHandler(async (event) => {
           message: 'شما دسترسی لازم برای این عملیات را ندارید'
         });
       }
+    } else {
+      // اگر مسیر خاصی تعریف نشده، فقط بررسی ADMIN بودن کافی است
+      console.log('✅ [Admin Middleware] General admin access granted');
     }
 
     console.log('✅ [Admin Middleware] Admin access granted:', {
