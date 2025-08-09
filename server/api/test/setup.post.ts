@@ -47,8 +47,10 @@ export default defineEventHandler(async (event) => {
     const bettor1 = await findOrCreateUser({ wallet: 'wallet_bettor1', username: 'BettorOne', balance: 75000n, referralCode: 'BETT1' }, transaction);
     const bettor2 = await findOrCreateUser({ wallet: 'wallet_bettor2', username: 'BettorTwo', balance: 120000n, referralCode: 'BETT2' }, transaction);
 
-    // --- ۲. ایجاد یک قالب برای استفاده ---
-    const [templateInstance] = await EventTemplate.findOrCreate({
+    // --- ۲. ایجاد قالب‌های پیش‌فرض ---
+    
+    // Template 1: Binary Yes/No Template
+    const [yesNoTemplate] = await EventTemplate.findOrCreate({
         where: { name: 'Crypto Price Prediction' },
         defaults: {
             name: 'Crypto Price Prediction',
@@ -63,16 +65,74 @@ export default defineEventHandler(async (event) => {
                     { name: 'target', label: 'Target Price', type: 'text' },
                     { name: 'date', label: 'Target Date', type: 'date' }
                 ]
+            },
+            outcomesStructure: {
+                type: 'FIXED',
+                options: [
+                    { title: 'Yes' },
+                    { title: 'No' }
+                ]
             }
         },
         transaction
     });
-    const template = templateInstance.get({ plain: true });
+
+    // Template 2: Who will win? (Dynamic Outcomes)
+    await EventTemplate.findOrCreate({
+        where: { name: 'Competition (Who will win?)' },
+        defaults: {
+            name: 'Competition (Who will win?)',
+            description: 'A template for predicting the winner of a match or competition. You define the competitors.',
+            structure: {
+                templateType: 'COMPETITIVE',
+                titleStructure: 'Who will win the [title] [context]?',
+                inputs: [
+                    { name: 'title', label: 'Competition Title', type: 'text' },
+                    { name: 'context', label: 'Additional Context', type: 'text' }
+                ]
+            },
+            outcomesStructure: {
+                type: 'DYNAMIC',
+                min: 2,
+                max: 10
+            },
+            creatorType: 'USER',
+            isActive: true,
+        },
+        transaction
+    });
+
+    // Template 3: Numerical Range Prediction (Dynamic Outcomes)
+    await EventTemplate.findOrCreate({
+        where: { name: 'Numerical Prediction' },
+        defaults: {
+            name: 'Numerical Prediction',
+            description: 'A template for predicting a numerical outcome within defined ranges.',
+            structure: {
+                templateType: 'COMPETITIVE',
+                titleStructure: 'What will be the [metric] by [date]?',
+                inputs: [
+                    { name: 'metric', label: 'Metric to Predict', type: 'text' },
+                    { name: 'date', label: 'Prediction Date', type: 'date' }
+                ]
+            },
+            outcomesStructure: {
+                type: 'DYNAMIC',
+                min: 2,
+                max: 5
+            },
+            creatorType: 'USER',
+            isActive: true,
+        },
+        transaction
+    });
+
+    const template = yesNoTemplate.get({ plain: true });
 
     // --- ۳. ایجاد 10 رویداد متنوع ---
     const events = [
         {
-            title: '[PENDING] Will Solana reach $200 by end of month?',
+            title: '[PENDING] Will jafar reach $200 by end of month?',
             description: 'A test event created by a user, waiting for admin approval.',
             status: 'PENDING_APPROVAL' as const,
             bettingDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days

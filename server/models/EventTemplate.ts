@@ -38,6 +38,11 @@ export const initEventTemplateModel = (sequelize: Sequelize): void => {
         type: DataTypes.JSONB,
         allowNull: false,
       },
+      outcomesStructure: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        comment: 'ساختار گزینه‌ها (FIXED یا DYNAMIC)',
+      },
       creatorType: {
         type: DataTypes.ENUM('ADMIN', 'USER', 'BOTH'),
         defaultValue: 'BOTH',

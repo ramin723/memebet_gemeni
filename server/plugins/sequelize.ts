@@ -346,8 +346,12 @@ export default defineNitroPlugin(async (nitroApp) => {
     
     // همگام‌سازی مدل‌ها با دیتابیس
     console.log('🔄 Syncing models with database...');
-    await sequelize.sync({ force: false });
-    console.log('✅ Database tables synced successfully.');
+    try {
+      await sequelize.sync({ force: false }); // فقط sync عادی
+      console.log('✅ Database tables synced successfully.');
+    } catch (syncError) {
+      console.error('⚠️ Sync error (continuing anyway):', syncError);
+    }
     
     nitroApp.hooks.hook('request', (event) => {
       event.context.sequelize = sequelize;

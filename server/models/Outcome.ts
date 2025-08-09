@@ -41,6 +41,16 @@ export const initOutcomeModel = (sequelize: Sequelize): void => {
         allowNull: false,
         defaultValue: false,
       },
+      imageUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'تصویر گزینه',
+      },
+      status: {
+        type: DataTypes.ENUM('ACTIVE', 'DISABLED'),
+        allowNull: false,
+        defaultValue: 'ACTIVE',
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -56,6 +66,12 @@ export const initOutcomeModel = (sequelize: Sequelize): void => {
       sequelize,
       tableName: 'outcomes',
       timestamps: true,
+      indexes: [
+        {
+          name: 'outcomes_status_idx',
+          fields: ['status'],
+        },
+      ],
     }
   );
 };

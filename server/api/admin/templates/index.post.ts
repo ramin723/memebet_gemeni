@@ -1,6 +1,6 @@
 import { defineEventHandler, createError, readBody } from '#imports';
 import { EventTemplate } from '../../../models/EventTemplate';
-import type { TemplateStructure } from '../../../types/EventTemplateInterface';
+import type { TemplateStructure, OutcomesStructure } from '../../../types/EventTemplateInterface';
 import adminMiddleware from '../../../middleware/02.admin';
 
 // Helper function for validation
@@ -14,6 +14,29 @@ const isValidTemplateStructure = (structure: any): structure is TemplateStructur
   return true;
 };
 
+// Helper function for outcomesStructure validation
+const isValidOutcomesStructure = (outcomesStructure: any): outcomesStructure is OutcomesStructure => {
+  if (!outcomesStructure || typeof outcomesStructure !== 'object') return false;
+  const { type } = outcomesStructure;
+  
+  if (!['FIXED', 'DYNAMIC'].includes(type)) return false;
+  
+  if (type === 'FIXED') {
+    const { options } = outcomesStructure;
+    if (!Array.isArray(options) || options.length === 0) return false;
+    // Validate each option has a title
+    for (const option of options) {
+      if (!option.title || typeof option.title !== 'string') return false;
+    }
+  } else if (type === 'DYNAMIC') {
+    const { min, max } = outcomesStructure;
+    if (typeof min !== 'number' || typeof max !== 'number') return false;
+    if (min < 2 || max < min || max > 20) return false; // Reasonable limits
+  }
+  
+  return true;
+};
+
 export default defineEventHandler(async (event) => {
   await adminMiddleware(event);
 
@@ -21,7 +44,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event);
-    const { name, description, structure, creatorType } = body;
+    const { name, description, structure, outcomesStructure, creatorType } = body;
 
     // اعتبارسنجی ورودی‌ها
     if (!name || !structure || !creatorType) {
@@ -39,11 +62,20 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // اعتبارسنجی outcomesStructure (اختیاری)
+    if (outcomesStructure && !isValidOutcomesStructure(outcomesStructure)) {
+      throw createError({
+        statusCode: 400,
+        message: 'ساختار گزینه‌ها نامعتبر است'
+      });
+    }
+
     // ایجاد قالب جدید
     const newTemplate = await EventTemplate.create({
       name,
       description,
       structure, // Sequelize handles JSONB serialization automatically
+      outcomesStructure, // New field for outcomes structure
       creatorType,
       isActive: true
     });

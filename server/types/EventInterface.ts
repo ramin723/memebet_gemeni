@@ -6,7 +6,9 @@ export interface EventAttributes {
   status?: 'DRAFT' | 'PENDING_APPROVAL' | 'ACTIVE' | 'REJECTED' | 'CLOSED' | 'RESOLVED' | 'CANCELLED';
   bettingDeadline?: Date;
   resolutionSource?: string | null;
+  resolutionSourceUrl?: string | null;
   winningOutcomeId?: string | null;
+  isCustom?: boolean;
   isFeatured?: boolean;
   adminNote?: string | null;
   imageUrl?: string | null;

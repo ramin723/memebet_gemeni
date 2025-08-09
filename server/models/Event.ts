@@ -42,9 +42,20 @@ export const initEventModel = (sequelize: Sequelize): void => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      resolutionSourceUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'لینک منبع داوری',
+      },
       winningOutcomeId: {
         type: DataTypes.BIGINT,
         allowNull: true,
+      },
+      isCustom: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        comment: 'آیا رویداد سفارشی است یا از قالب',
       },
       isFeatured: {
         type: DataTypes.BOOLEAN,

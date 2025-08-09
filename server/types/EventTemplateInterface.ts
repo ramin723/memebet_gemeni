@@ -4,6 +4,13 @@ export interface TemplateInput {
   type: 'text' | 'date' | 'textarea';
 }
 
+export interface OutcomesStructure {
+  type: 'FIXED' | 'DYNAMIC';
+  options?: { title: string }[]; // For FIXED type
+  min?: number; // For DYNAMIC type
+  max?: number; // For DYNAMIC type
+}
+
 export interface TemplateStructure {
   templateType: 'BINARY' | 'COMPETITIVE' | 'HEAD_TO_HEAD';
   titleStructure: string;
@@ -16,6 +23,7 @@ export interface EventTemplateAttributes {
   name?: string;
   description?: string;
   structure?: TemplateStructure;
+  outcomesStructure?: OutcomesStructure;
   creatorType?: 'ADMIN' | 'USER' | 'BOTH';
   isActive?: boolean;
   createdAt?: Date;
@@ -26,6 +34,7 @@ export interface CreateEventTemplateInput {
   name: string;
   description?: string;
   structure: TemplateStructure;
+  outcomesStructure?: OutcomesStructure;
   creatorType?: 'ADMIN' | 'USER' | 'BOTH';
   isActive?: boolean;
 }
@@ -34,6 +43,7 @@ export interface UpdateEventTemplateInput {
   name?: string;
   description?: string;
   structure?: TemplateStructure;
+  outcomesStructure?: OutcomesStructure;
   creatorType?: 'ADMIN' | 'USER' | 'BOTH';
   isActive?: boolean;
 } 

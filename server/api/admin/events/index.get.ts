@@ -1,6 +1,6 @@
-import { defineEventHandler, getQuery, createError } from 'h3' // 1. createError را import کن
-import { Event } from '~/server/models/Event'
-import { User } from '~/server/models/User'
+import { defineEventHandler, getQuery, createError } from 'h3'
+import { Event } from '../../../models/Event'
+import { User } from '../../../models/User'
 
 export default defineEventHandler(async (event) => {
   // TODO: Add admin middleware check later

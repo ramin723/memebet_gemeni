@@ -1,7 +1,44 @@
 import { defineEventHandler, readBody, getRouterParam, createError } from 'h3';
 import { EventTemplate } from '../../../../models/EventTemplate';
+import type { TemplateStructure, OutcomesStructure } from '../../../../types/EventTemplateInterface';
+import adminMiddleware from '../../../../middleware/02.admin';
+
+// Helper function for validation
+const isValidTemplateStructure = (structure: any): structure is TemplateStructure => {
+  if (!structure || typeof structure !== 'object') return false;
+  const { templateType, titleStructure, inputs } = structure;
+  if (!['BINARY', 'COMPETITIVE', 'HEAD_TO_HEAD'].includes(templateType)) return false;
+  if (typeof titleStructure !== 'string' || !titleStructure) return false;
+  if (!Array.isArray(inputs) || inputs.length === 0) return false;
+  return true;
+};
+
+// Helper function for outcomesStructure validation
+const isValidOutcomesStructure = (outcomesStructure: any): outcomesStructure is OutcomesStructure => {
+  if (!outcomesStructure || typeof outcomesStructure !== 'object') return false;
+  const { type } = outcomesStructure;
+  
+  if (!['FIXED', 'DYNAMIC'].includes(type)) return false;
+  
+  if (type === 'FIXED') {
+    const { options } = outcomesStructure;
+    if (!Array.isArray(options) || options.length === 0) return false;
+    // Validate each option has a title
+    for (const option of options) {
+      if (!option.title || typeof option.title !== 'string') return false;
+    }
+  } else if (type === 'DYNAMIC') {
+    const { min, max } = outcomesStructure;
+    if (typeof min !== 'number' || typeof max !== 'number') return false;
+    if (min < 2 || max < min || max > 20) return false; // Reasonable limits
+  }
+  
+  return true;
+};
 
 export default defineEventHandler(async (event) => {
+  await adminMiddleware(event);
+
   try {
     // دریافت templateId از پارامترها
     const templateId = getRouterParam(event, 'id');
@@ -15,32 +52,30 @@ export default defineEventHandler(async (event) => {
 
     // دریافت داده‌ها از body
     const body = await readBody(event);
-    const { name, description, category, outcomes, isActive } = body;
+    const { name, description, structure, outcomesStructure, creatorType, isActive } = body;
 
     // اعتبارسنجی داده‌های ورودی
-    if (!name || !description || !category || !outcomes) {
+    if (!name || !structure || !creatorType) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Name, description, category, and outcomes are required'
+        statusMessage: 'Name, structure, and creatorType are required'
       });
     }
 
-    // بررسی اینکه outcomes آرایه باشد و حداقل 2 آیتم داشته باشد
-    if (!Array.isArray(outcomes) || outcomes.length < 2) {
+    // اعتبارسنجی ساختار قالب
+    if (!isValidTemplateStructure(structure)) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Outcomes must be an array with at least 2 items'
+        statusMessage: 'ساختار قالب ارسال شده نامعتبر است.'
       });
     }
 
-    // بررسی اینکه هر outcome دارای name باشد
-    for (const outcome of outcomes) {
-      if (!outcome.name || typeof outcome.name !== 'string') {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Each outcome must have a valid name'
-        });
-      }
+    // اعتبارسنجی outcomesStructure (اختیاری)
+    if (outcomesStructure && !isValidOutcomesStructure(outcomesStructure)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'ساختار گزینه‌ها نامعتبر است'
+      });
     }
 
     // پیدا کردن قالب
@@ -57,26 +92,21 @@ export default defineEventHandler(async (event) => {
     const updateData: any = {
       name,
       description,
-      category,
-      outcomes,
-      isActive: isActive !== undefined ? isActive : (template as any).isActive
+      structure,
+      outcomesStructure,
+      creatorType,
+      isActive: isActive !== undefined ? isActive : template.get('isActive')
     };
 
     await template.update(updateData);
 
     // بازگرداندن قالب به‌روزرسانی شده
+    const updatedTemplate = template.get({ plain: true });
+    
     return {
       success: true,
-      message: 'Template updated successfully',
-      data: {
-        id: (template as any).id,
-        name: (template as any).name,
-        description: (template as any).description,
-        category: (template as any).category,
-        outcomes: (template as any).outcomes,
-        isActive: (template as any).isActive,
-        updatedAt: (template as any).updatedAt
-      }
+      message: 'قالب با موفقیت به‌روزرسانی شد',
+      data: updatedTemplate
     };
 
   } catch (error: any) {
