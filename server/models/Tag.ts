@@ -5,6 +5,7 @@ export class Tag extends Model<TagAttributes> {
   public id!: string;
   public name!: string;
   public description!: string | null;
+  public parentId!: string | null;
   public createdAt!: Date;
   public updatedAt!: Date;
 
@@ -63,6 +64,10 @@ export const initTagModel = (sequelize: Sequelize): void => {
         {
           name: 'tags_name_idx',
           fields: ['name']
+        },
+        {
+          name: 'tags_parent_id_idx',
+          fields: ['parent_id']
         }
       ]
     }

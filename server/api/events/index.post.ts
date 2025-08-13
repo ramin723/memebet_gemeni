@@ -3,6 +3,7 @@ import { Event } from '../../models/Event';
 import { User } from '../../models/User';
 import { Outcome } from '../../models/Outcome';
 import { EventTemplate } from '../../models/EventTemplate';
+import { EventTag } from '../../models/EventTag';
 import type { TemplateStructure, OutcomesStructure } from '../../types/EventTemplateInterface';
 
 interface CreateEventBody {
@@ -12,6 +13,7 @@ interface CreateEventBody {
   description?: string;
   bettingDeadline: Date;
   outcomes?: Array<{ title: string }> | string[];
+  tagIds?: string[]; // آرایه‌ای از شناسه‌های تگ‌ها
 }
 
 // Helper function to build title from template
@@ -193,6 +195,20 @@ export default defineEventHandler(async (event) => {
       }, { transaction });
     });
     await Promise.all(outcomePromises);
+
+    // ثبت تگ‌های رویداد (اگر مشخص شده باشند)
+    if (body.tagIds && Array.isArray(body.tagIds) && body.tagIds.length > 0) {
+      const validTagIds = body.tagIds
+        .filter(tagId => tagId && typeof tagId === 'string')
+        .map(tagId => tagId as string);
+      
+      for (const tagId of validTagIds) {
+        await EventTag.create({
+          eventId: newEvent.id,
+          tagId: tagId,
+        }, { transaction });
+      }
+    }
 
     await transaction.commit();
 

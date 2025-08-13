@@ -61,7 +61,7 @@ export const initEventTagModel = (sequelize: Sequelize): void => {
           fields: ['tag_id']
         },
         {
-          name: 'event_tags_event_tag_unique_idx',
+          name: 'event_tag_unique',
           fields: ['event_id', 'tag_id'],
           unique: true
         }

@@ -67,6 +67,28 @@ export const initBetModel = (sequelize: Sequelize): void => {
       sequelize,
       tableName: 'bets',
       timestamps: true,
+      indexes: [
+        {
+          name: 'bets_user_id_idx',
+          fields: ['userId']
+        },
+        {
+          name: 'bets_event_id_idx',
+          fields: ['eventId']
+        },
+        {
+          name: 'bets_outcome_id_idx',
+          fields: ['outcomeId']
+        },
+        {
+          name: 'bets_status_idx',
+          fields: ['status']
+        },
+        {
+          name: 'bets_created_at_idx',
+          fields: ['createdAt']
+        }
+      ]
     }
   );
 };

@@ -68,10 +68,18 @@ export const initOutcomeModel = (sequelize: Sequelize): void => {
       timestamps: true,
       indexes: [
         {
-          name: 'outcomes_status_idx',
-          fields: ['status'],
+          name: 'outcomes_event_id_idx',
+          fields: ['eventId']
         },
-      ],
+        {
+          name: 'outcomes_status_idx',
+          fields: ['status']
+        },
+        {
+          name: 'outcomes_is_winner_idx',
+          fields: ['isWinner']
+        }
+      ]
     }
   );
 };

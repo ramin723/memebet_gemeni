@@ -64,6 +64,20 @@ export const initWalletHistoryModel = (sequelize: Sequelize): void => {
       sequelize,
       tableName: 'wallet_histories',
       timestamps: true,
+      indexes: [
+        {
+          name: 'wallet_histories_user_id_idx',
+          fields: ['userId']
+        },
+        {
+          name: 'wallet_histories_type_idx',
+          fields: ['type']
+        },
+        {
+          name: 'wallet_histories_created_at_idx',
+          fields: ['createdAt']
+        }
+      ]
     }
   );
 };

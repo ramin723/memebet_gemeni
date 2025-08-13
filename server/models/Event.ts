@@ -96,6 +96,28 @@ export const initEventModel = (sequelize: Sequelize): void => {
       sequelize,
       tableName: 'events',
       timestamps: true,
+      indexes: [
+        {
+          name: 'events_creator_id_idx',
+          fields: ['creatorId']
+        },
+        {
+          name: 'events_status_idx',
+          fields: ['status']
+        },
+        {
+          name: 'events_betting_deadline_idx',
+          fields: ['bettingDeadline']
+        },
+        {
+          name: 'events_is_featured_idx',
+          fields: ['isFeatured']
+        },
+        {
+          name: 'events_created_at_idx',
+          fields: ['createdAt']
+        }
+      ]
     }
   );
 };

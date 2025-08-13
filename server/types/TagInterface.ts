@@ -10,6 +10,7 @@ export interface TagAttributes {
 export interface CreateTagInput {
   name: string;
   description?: string;
+  parentId?: string | null;
 }
 
 export interface UpdateTagInput {

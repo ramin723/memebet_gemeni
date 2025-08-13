@@ -67,6 +67,24 @@ export const initTransactionModel = (sequelize: Sequelize): void => {
       sequelize,
       tableName: 'transactions',
       timestamps: true,
+      indexes: [
+        {
+          name: 'transactions_user_id_idx',
+          fields: ['userId']
+        },
+        {
+          name: 'transactions_type_idx',
+          fields: ['type']
+        },
+        {
+          name: 'transactions_status_idx',
+          fields: ['status']
+        },
+        {
+          name: 'transactions_created_at_idx',
+          fields: ['createdAt']
+        }
+      ]
     }
   );
 };

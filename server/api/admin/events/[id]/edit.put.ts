@@ -67,10 +67,11 @@ export default defineEventHandler(async (event) => {
         })
 
         // ایجاد گزینه‌های جدید
-        const outcomePromises = outcomes.map((outcomeTitle: string) => {
+        const outcomePromises = outcomes.map((outcome: any) => {
           return Outcome.create({
             eventId: currentId,
-            title: outcomeTitle,
+            title: outcome.title || outcome,
+            imageUrl: outcome.imageUrl || undefined,
           }, { transaction })
         })
 

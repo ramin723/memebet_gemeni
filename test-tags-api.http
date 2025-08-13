@@ -1,0 +1,41 @@
+### تست API های تگ
+
+### 1. دریافت لیست تگ‌ها (GET)
+GET http://localhost:3000/api/admin/tags
+Authorization: Bearer YOUR_ADMIN_TOKEN
+
+### 2. ایجاد تگ جدید (POST)
+POST http://localhost:3000/api/admin/tags
+Authorization: Bearer YOUR_ADMIN_TOKEN
+Content-Type: application/json
+
+{
+  "name": "تست تگ",
+  "description": "این یک تگ تست است",
+  "parentId": null
+}
+
+### 3. ایجاد تگ فرزند (POST)
+POST http://localhost:3000/api/admin/tags
+Authorization: Bearer YOUR_ADMIN_TOKEN
+Content-Type: application/json
+
+{
+  "name": "تگ فرزند",
+  "description": "این تگ فرزند تگ تست است",
+  "parentId": "1"
+}
+
+### 4. به‌روزرسانی تگ (PUT)
+PUT http://localhost:3000/api/admin/tags/1
+Authorization: Bearer YOUR_ADMIN_TOKEN
+Content-Type: application/json
+
+{
+  "name": "تگ تست به‌روزرسانی شده",
+  "description": "توضیحات به‌روزرسانی شده"
+}
+
+### 5. حذف تگ (DELETE)
+DELETE http://localhost:3000/api/admin/tags/1
+Authorization: Bearer YOUR_ADMIN_TOKEN

@@ -47,87 +47,189 @@ export default defineEventHandler(async (event) => {
     const bettor1 = await findOrCreateUser({ wallet: 'wallet_bettor1', username: 'BettorOne', balance: 75000n, referralCode: 'BETT1' }, transaction);
     const bettor2 = await findOrCreateUser({ wallet: 'wallet_bettor2', username: 'BettorTwo', balance: 120000n, referralCode: 'BETT2' }, transaction);
 
-    // --- ۲. ایجاد قالب‌های پیش‌فرض ---
+    // --- ۲. ایجاد قالب‌های پیشرفته ---
     
-    // Template 1: Binary Yes/No Template
-    const [yesNoTemplate] = await EventTemplate.findOrCreate({
-        where: { name: 'Crypto Price Prediction' },
-        defaults: {
-            name: 'Crypto Price Prediction',
-            description: 'A template for crypto price predictions.',
-            creatorType: 'BOTH',
-            isActive: true,
-            structure: {
-                templateType: 'BINARY',
-                titleStructure: 'Will [asset] reach [target] by [date]?',
-                inputs: [
-                    { name: 'asset', label: 'Asset Name', type: 'text' },
-                    { name: 'target', label: 'Target Price', type: 'text' },
-                    { name: 'date', label: 'Target Date', type: 'date' }
-                ]
-            },
-            outcomesStructure: {
-                type: 'FIXED',
-                options: [
-                    { title: 'Yes' },
-                    { title: 'No' }
-                ]
-            }
-        },
-        transaction
+    console.log('🌱 Seeding Event Templates...');
+    // ابتدا تمام قالب‌های قدیمی را پاک می‌کنیم تا از تکرار جلوگیری شود
+    await EventTemplate.destroy({ where: {} });
+
+    // --- CATEGORY 1: Binary Predictions (Yes/No) ---
+    
+    await EventTemplate.create({
+      name: 'Goal Achievement',
+      description: 'Will [person/team/company] achieve [goal] by [date]?',
+      structure: {
+        templateType: 'BINARY',
+        titleStructure: 'Will [person/team/company] achieve [goal] by [date]?',
+        inputs: [
+          { name: 'person/team/company', label: 'Person/Team/Company', type: 'text' },
+          { name: 'goal', label: 'Goal to Achieve', type: 'text' },
+          { name: 'date', label: 'Target Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'FIXED', options: [{ title: 'Yes' }, { title: 'No' }] },
+      creatorType: 'USER',
+      isActive: true,
     });
 
-    // Template 2: Who will win? (Dynamic Outcomes)
-    await EventTemplate.findOrCreate({
-        where: { name: 'Competition (Who will win?)' },
-        defaults: {
-            name: 'Competition (Who will win?)',
-            description: 'A template for predicting the winner of a match or competition. You define the competitors.',
-            structure: {
-                templateType: 'COMPETITIVE',
-                titleStructure: 'Who will win the [title] [context]?',
-                inputs: [
-                    { name: 'title', label: 'Competition Title', type: 'text' },
-                    { name: 'context', label: 'Additional Context', type: 'text' }
-                ]
-            },
-            outcomesStructure: {
-                type: 'DYNAMIC',
-                min: 2,
-                max: 10
-            },
-            creatorType: 'USER',
-            isActive: true,
-        },
-        transaction
+    await EventTemplate.create({
+      name: 'Metric Exceedance',
+      description: 'Will [metric] exceed [value] before [date]?',
+      structure: {
+        templateType: 'BINARY',
+        titleStructure: 'Will [metric] exceed [value] before [date]?',
+        inputs: [
+          { name: 'metric', label: 'Metric Name', type: 'text' },
+          { name: 'value', label: 'Target Value', type: 'text' },
+          { name: 'date', label: 'Target Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'FIXED', options: [{ title: 'Yes' }, { title: 'No' }] },
+      creatorType: 'USER',
+      isActive: true,
     });
 
-    // Template 3: Numerical Range Prediction (Dynamic Outcomes)
-    await EventTemplate.findOrCreate({
-        where: { name: 'Numerical Prediction' },
-        defaults: {
-            name: 'Numerical Prediction',
-            description: 'A template for predicting a numerical outcome within defined ranges.',
-            structure: {
-                templateType: 'COMPETITIVE',
-                titleStructure: 'What will be the [metric] by [date]?',
-                inputs: [
-                    { name: 'metric', label: 'Metric to Predict', type: 'text' },
-                    { name: 'date', label: 'Prediction Date', type: 'date' }
-                ]
-            },
-            outcomesStructure: {
-                type: 'DYNAMIC',
-                min: 2,
-                max: 5
-            },
-            creatorType: 'USER',
-            isActive: true,
-        },
-        transaction
+    // --- CATEGORY 2: Competitions (Dynamic Choices) ---
+
+    await EventTemplate.create({
+      name: 'Competition Winner',
+      description: 'Who will win the [competition]?',
+      structure: {
+        templateType: 'COMPETITIVE',
+        titleStructure: 'Who will win the [competition]?',
+        inputs: [
+          { name: 'competition', label: 'Competition Name', type: 'text' }
+        ]
+      },
+      outcomesStructure: { type: 'DYNAMIC_CHOICE', min: 2, max: 10, placeholder: 'Competitor Name' },
+      creatorType: 'USER',
+      isActive: true,
     });
 
-    const template = yesNoTemplate.get({ plain: true });
+    await EventTemplate.create({
+      name: 'Multi-Choice Poll',
+      description: 'Which option in [topic] will be the most popular?',
+      structure: {
+        templateType: 'COMPETITIVE',
+        titleStructure: 'Which option in [topic] will be the most popular?',
+        inputs: [
+          { name: 'topic', label: 'Topic/Subject', type: 'text' }
+        ]
+      },
+      outcomesStructure: { type: 'DYNAMIC_CHOICE', min: 2, max: 5, placeholder: 'Option Title' },
+      creatorType: 'USER',
+      isActive: true,
+    });
+    
+    // --- CATEGORY 3: Numerical Predictions (Dynamic Ranges) ---
+
+    await EventTemplate.create({
+      name: 'Exact Value Prediction',
+      description: 'What will be the final value of [metric] on [date]?',
+      structure: {
+        templateType: 'COMPETITIVE',
+        titleStructure: 'What will be the final value of [metric] on [date]?',
+        inputs: [
+          { name: 'metric', label: 'Metric to Predict', type: 'text' },
+          { name: 'date', label: 'Target Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'DYNAMIC_RANGE', min: 2, max: 5, placeholder: 'e.g., 20-30' },
+      creatorType: 'USER',
+      isActive: true,
+    });
+    
+    await EventTemplate.create({
+      name: 'Production/Sales Volume',
+      description: 'How many [units] will [entity] produce/sell by [date]?',
+      structure: {
+        templateType: 'COMPETITIVE',
+        titleStructure: 'How many [units] will [entity] produce/sell by [date]?',
+        inputs: [
+          { name: 'units', label: 'Units (e.g., cars, phones)', type: 'text' },
+          { name: 'entity', label: 'Company/Entity', type: 'text' },
+          { name: 'date', label: 'Target Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'DYNAMIC_RANGE', min: 2, max: 5, placeholder: 'e.g., 1-1.5 Million' },
+      creatorType: 'USER',
+      isActive: true,
+    });
+
+    // --- CATEGORY 4: Comparative Predictions ---
+
+    await EventTemplate.create({
+      name: 'Metric Comparison',
+      description: 'Which will be higher on [date]: [metric A] or [metric B]?',
+      structure: {
+        templateType: 'HEAD_TO_HEAD',
+        titleStructure: 'Which will be higher on [date]: [metric A] or [metric B]?',
+        inputs: [
+          { name: 'metric A', label: 'First Metric', type: 'text' },
+          { name: 'metric B', label: 'Second Metric', type: 'text' },
+          { name: 'date', label: 'Comparison Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'FIXED', options: [{ title: 'Metric A' }, { title: 'Metric B' }] },
+      creatorType: 'USER',
+      isActive: true,
+    });
+
+    await EventTemplate.create({
+      name: 'Ranking Prediction',
+      description: 'Will [entity] rank in the top [N] for [category] by [date]?',
+      structure: {
+        templateType: 'BINARY',
+        titleStructure: 'Will [entity] rank in the top [N] for [category] by [date]?',
+        inputs: [
+          { name: 'entity', label: 'Entity/Company', type: 'text' },
+          { name: 'N', label: 'Rank Position (e.g., 5)', type: 'text' },
+          { name: 'category', label: 'Category/Industry', type: 'text' },
+          { name: 'date', label: 'Target Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'FIXED', options: [{ title: 'Yes' }, { title: 'No' }] },
+      creatorType: 'USER',
+      isActive: true,
+    });
+
+    // --- CATEGORY 5: Timeline Predictions ---
+
+    await EventTemplate.create({
+      name: 'Event Occurrence',
+      description: 'Will [event] occur before [date]?',
+      structure: {
+        templateType: 'BINARY',
+        titleStructure: 'Will [event] occur before [date]?',
+        inputs: [
+          { name: 'event', label: 'Event Description', type: 'text' },
+          { name: 'date', label: 'Deadline Date', type: 'date' }
+        ]
+      },
+      outcomesStructure: { type: 'FIXED', options: [{ title: 'Yes' }, { title: 'No' }] },
+      creatorType: 'USER',
+      isActive: true,
+    });
+    
+    // --- CATEGORY 6: Sequential Events (My Suggestion) ---
+    
+    await EventTemplate.create({
+      name: 'Sequential Event Race',
+      description: 'Which will happen first: [Event A] or [Event B]?',
+      structure: {
+        templateType: 'HEAD_TO_HEAD',
+        titleStructure: 'Which will happen first: [Event A] or [Event B]?',
+        inputs: [
+          { name: 'Event A', label: 'First Event', type: 'text' },
+          { name: 'Event B', label: 'Second Event', type: 'text' }
+        ]
+      },
+      outcomesStructure: { type: 'FIXED', options: [{ title: 'Event A' }, { title: 'Event B' }, { title: 'Neither by end of year' }] },
+      creatorType: 'USER',
+      isActive: true,
+    });
+
+    console.log('✅ Event Templates seeded successfully.');
 
     // --- ۳. ایجاد 10 رویداد متنوع ---
     const events = [

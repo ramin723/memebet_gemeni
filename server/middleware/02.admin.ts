@@ -6,6 +6,7 @@ const PERMISSIONS = {
   EVENT_MANAGEMENT: 'event_management',
   FINANCIAL_MANAGEMENT: 'financial_management',
   TEMPLATE_MANAGEMENT: 'template_management',
+  TAG_MANAGEMENT: 'tag_management',
   SYSTEM_ADMIN: 'system_admin'
 } as const;
 
@@ -16,6 +17,7 @@ const PATH_PERMISSIONS: Record<string, string[]> = {
   '/api/admin/deposits/': [PERMISSIONS.FINANCIAL_MANAGEMENT],
   '/api/admin/withdrawals/': [PERMISSIONS.FINANCIAL_MANAGEMENT],
   '/api/admin/templates/': [PERMISSIONS.TEMPLATE_MANAGEMENT],
+  '/api/admin/tags/': [PERMISSIONS.TAG_MANAGEMENT],
   '/api/admin/test/': [PERMISSIONS.SYSTEM_ADMIN]
 };
 

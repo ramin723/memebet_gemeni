@@ -59,6 +59,24 @@ export const initReportModel = (sequelize: Sequelize): void => {
       tableName: 'reports',
       timestamps: true,
       underscored: true,
+      indexes: [
+        {
+          name: 'reports_reporter_id_idx',
+          fields: ['reporter_id']
+        },
+        {
+          name: 'reports_entity_type_entity_id_idx',
+          fields: ['entity_type', 'entity_id']
+        },
+        {
+          name: 'reports_status_idx',
+          fields: ['status']
+        },
+        {
+          name: 'reports_resolved_by_idx',
+          fields: ['resolved_by_id']
+        }
+      ]
     }
   );
 };

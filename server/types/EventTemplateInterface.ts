@@ -2,13 +2,15 @@ export interface TemplateInput {
   name: string;
   label: string;
   type: 'text' | 'date' | 'textarea';
+  placeholder?: string;
 }
 
 export interface OutcomesStructure {
-  type: 'FIXED' | 'DYNAMIC';
+  type: 'FIXED' | 'DYNAMIC_CHOICE' | 'DYNAMIC_RANGE';
   options?: { title: string }[]; // For FIXED type
-  min?: number; // For DYNAMIC type
-  max?: number; // For DYNAMIC type
+  min?: number; // For DYNAMIC_CHOICE and DYNAMIC_RANGE types
+  max?: number; // For DYNAMIC_CHOICE and DYNAMIC_RANGE types
+  placeholder?: string; // For DYNAMIC types
 }
 
 export interface TemplateStructure {
